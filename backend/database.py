@@ -25,9 +25,16 @@ class DatabaseManager:
         self.db_path = db_path
     
     def get_connection(self) -> sqlite3.Connection:
-        """데이터베이스 연결 반환"""
-        conn = sqlite3.connect(self.db_path)
+        """데이터베이스 연결 반환 (WAL 모드 활성화)"""
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
         conn.row_factory = sqlite3.Row  # 딕셔너리 형태로 결과 반환
+        
+        # WAL 모드 활성화 (동시성 개선)
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.execute("PRAGMA cache_size=10000")
+        conn.execute("PRAGMA temp_store=MEMORY")
+        
         return conn
     
     def execute_query(self, query: str, params: tuple = ()) -> List[Dict[str, Any]]:

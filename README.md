@@ -14,7 +14,7 @@ A comprehensive stock trading system powered by multiple AI agents that provide 
 
 ### 📊 Real-Time Dashboard
 - Portfolio performance tracking with interactive charts
-- Live market data integration
+- Near real-time market data integration (with potential delays)
 - AI agent status monitoring
 - Sector allocation visualization
 
@@ -60,14 +60,20 @@ ai-stock-trading-system/
 
 ### Prerequisites
 - Python 3.11+
-- Node.js 22+
+- Node.js 20+ (LTS recommended)
 - OpenAI API Key (for AI analysis)
 
 ### Backend Setup
 ```bash
 cd backend
 pip install -r requirements.txt
-python data_collector.py  # Test data collection
+
+# Start the backend server
+python main.py
+
+# Or for production with gunicorn
+# pip install gunicorn
+# gunicorn -w 4 -b 0.0.0.0:8000 main:app
 ```
 
 ### Frontend Setup
@@ -78,10 +84,19 @@ pnpm run dev --host
 ```
 
 ### Environment Variables
-Create a `.env` file in the root directory:
-```env
-OPENAI_API_KEY=your_openai_api_key_here
-STOCK_API_KEY=your_stock_api_key_here
+Copy `.env.example` to `.env` and configure your settings:
+```bash
+cp .env.example .env
+# Edit .env with your actual API keys and configuration
+```
+
+**Important**: Never commit your `.env` file to version control!
+
+For frontend configuration, copy `frontend/.env.example` to `frontend/.env.local`:
+```bash
+cd frontend
+cp .env.example .env.local
+# Configure frontend-specific settings
 ```
 
 ## 🤖 AI Agents Overview
