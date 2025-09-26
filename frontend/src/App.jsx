@@ -7,6 +7,8 @@ import Dashboard from '@/components/Dashboard'
 import StockAnalysis from '@/components/StockAnalysis'
 import Portfolio from '@/components/Portfolio'
 import Settings from '@/components/Settings'
+import EventMonitor from '@/components/EventMonitor'
+import CostOptimizer from '@/components/CostOptimizer'
 import './App.css'
 
 function App() {
@@ -45,8 +47,13 @@ function App() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <h2 className="text-xl font-semibold text-foreground">AI Stock Trading System</h2>
-          <p className="text-muted-foreground">Initializing multi-agent analysis...</p>
+          <h2 className="text-xl font-semibold text-foreground">AI Stock Trading System v2.0</h2>
+          <p className="text-muted-foreground">Initializing advanced multi-agent system...</p>
+          <div className="text-sm text-muted-foreground space-y-1">
+            <div>✓ AI Model Abstraction Layer</div>
+            <div>✓ Real-time Event Architecture</div>
+            <div>✓ Cost Optimization Engine</div>
+          </div>
         </div>
       </div>
     )
@@ -63,6 +70,8 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/analysis" element={<StockAnalysis />} />
               <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/events" element={<EventMonitor />} />
+              <Route path="/optimizer" element={<CostOptimizer />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>
           </main>

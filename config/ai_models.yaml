@@ -1,0 +1,145 @@
+# AI 모델 설정 파일
+# 다양한 AI 모델과 에이전트 설정을 관리합니다
+
+# API 키 설정 (환경변수 우선)
+api_keys:
+  # openai: "your_openai_api_key_here"
+  # google: "your_google_api_key_here"
+  # anthropic: "your_anthropic_api_key_here"
+
+# 모델별 세부 설정
+model_settings:
+  openai_gpt4o:
+    temperature: 0.7
+    max_tokens: 2000
+    top_p: 0.9
+    frequency_penalty: 0.0
+    presence_penalty: 0.0
+    
+  openai_gpt4o_mini:
+    temperature: 0.8
+    max_tokens: 1500
+    top_p: 0.9
+    frequency_penalty: 0.1
+    presence_penalty: 0.1
+    
+  google_gemini_pro:
+    temperature: 0.7
+    max_tokens: 2000
+    top_p: 0.8
+    top_k: 40
+    
+  google_gemini_flash:
+    temperature: 0.8
+    max_tokens: 1000
+    top_p: 0.9
+    top_k: 32
+
+# 에이전트별 모델 할당
+agents:
+  optimistic_analyst:
+    primary_model: "openai_gpt4o_mini"
+    fallback_model: "google_gemini_flash"
+    prompt_template: "prompts/optimistic_analyst.txt"
+    temperature: 0.6  # 더 일관된 긍정적 분석
+    max_tokens: 1500
+    
+  pessimistic_analyst:
+    primary_model: "google_gemini_pro"
+    fallback_model: "openai_gpt4o_mini"
+    prompt_template: "prompts/pessimistic_analyst.txt"
+    temperature: 0.8  # 더 다양한 리스크 시나리오
+    max_tokens: 1500
+    
+  risk_manager:
+    primary_model: "openai_gpt4o"
+    fallback_model: "google_gemini_pro"
+    prompt_template: "prompts/risk_manager.txt"
+    temperature: 0.5  # 더 보수적이고 일관된 분석
+    max_tokens: 2000
+    
+  coordinator:
+    primary_model: "openai_gpt4o"
+    fallback_model: "google_gemini_pro"
+    prompt_template: "prompts/coordinator.txt"
+    temperature: 0.7
+    max_tokens: 2500
+
+# 비용 최적화 설정
+cost_optimization:
+  # 모델 캐스케이딩 전략
+  cascading_strategy:
+    enabled: true
+    # 1차: 경량 모델로 기본 분석
+    tier1_models: ["google_gemini_flash", "openai_gpt4o_mini"]
+    # 2차: 중간 성능 모델로 심화 분석
+    tier2_models: ["google_gemini_pro", "openai_gpt4o_mini"]
+    # 3차: 고성능 모델로 최종 분석
+    tier3_models: ["openai_gpt4o", "google_gemini_pro"]
+    
+  # 캐싱 설정
+  caching:
+    enabled: true
+    ttl_seconds: 300  # 5분 캐시
+    max_cache_size: 1000
+    
+  # 비용 제한
+  cost_limits:
+    daily_limit_usd: 10.0
+    per_request_limit_usd: 0.50
+    alert_threshold_usd: 8.0
+
+# 성능 모니터링
+monitoring:
+  # 응답 시간 임계값 (초)
+  response_time_threshold: 30.0
+  
+  # 성공률 임계값
+  success_rate_threshold: 0.95
+  
+  # 로깅 레벨
+  log_level: "INFO"
+  
+  # 메트릭 수집
+  collect_metrics: true
+
+# 에이전트 프롬프트 템플릿 경로
+prompt_templates:
+  base_path: "prompts/"
+  templates:
+    optimistic_analyst: "optimistic_analyst.txt"
+    pessimistic_analyst: "pessimistic_analyst.txt"
+    risk_manager: "risk_manager.txt"
+    coordinator: "coordinator.txt"
+
+# 모델 선호도 설정
+preferences:
+  # 기본 모델 (API 키가 있는 경우)
+  default_model: "openai_gpt4o_mini"
+  
+  # 고성능이 필요한 경우
+  high_performance_model: "openai_gpt4o"
+  
+  # 비용 효율적인 모델
+  cost_effective_model: "google_gemini_flash"
+  
+  # 빠른 응답이 필요한 경우
+  fast_response_model: "google_gemini_flash"
+
+# 실험적 기능
+experimental:
+  # 다중 모델 앙상블
+  ensemble_mode:
+    enabled: false
+    models: ["openai_gpt4o_mini", "google_gemini_pro"]
+    voting_strategy: "weighted"  # "majority", "weighted", "confidence"
+    
+  # A/B 테스트
+  ab_testing:
+    enabled: false
+    test_ratio: 0.1  # 10%의 요청에 대해 대체 모델 사용
+    
+  # 자동 모델 선택
+  auto_model_selection:
+    enabled: false
+    selection_criteria: "cost_performance"  # "cost", "performance", "cost_performance"
