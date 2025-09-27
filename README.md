@@ -14,8 +14,9 @@ A sophisticated AI-powered stock analysis system that combines multiple data sou
 ## ✨ Features
 
 ### 🧠 **Multi-Agent AI Analysis**
-- **GPT-4o Mini Integration**: Advanced natural language processing for market analysis
-- **Consensus-Based Decisions**: Multiple AI agents provide weighted recommendations
+- **OpenAI GPT-4o Mini Integration**: Latest OpenAI model with modern API compatibility
+- **Structured Analysis Output**: JSON-formatted responses with confidence scores
+- **Consensus-Based Decisions**: Multiple AI agents provide weighted recommendations  
 - **Technical & Fundamental Analysis**: Comprehensive evaluation of market conditions
 - **Risk Assessment**: Intelligent risk profiling and scenario analysis
 
@@ -68,8 +69,17 @@ nano .env
 ```
 
 **Required Environment Variables:**
+
+| Variable | Default | Required | Description |
+|----------|---------|----------|-------------|
+| `OPENAI_API_KEY` | - | ✅ **Yes** | OpenAI API key from [platform.openai.com](https://platform.openai.com/api-keys) |
+| `BACKEND_PORT` | `8000` | No | Backend server port |
+| `CORS_ALLOW_ORIGINS` | `http://localhost:5173` | No | Allowed frontend origins (comma-separated) |
+| `VITE_API_BASE` | `http://localhost:8000` | No | Backend API URL for frontend |
+
+**Example .env file:**
 ```env
-# OpenAI Configuration
+# OpenAI Configuration [REQUIRED]
 OPENAI_API_KEY=sk-your-openai-key-here
 OPENAI_MODEL=gpt-4o-mini
 OPENAI_TIMEOUT=30
@@ -77,10 +87,24 @@ OPENAI_MAX_RETRY=5
 
 # Backend Configuration
 BACKEND_PORT=8000
-CORS_ALLOW_ORIGINS=http://localhost:3000,http://localhost:5173
+APP_ENV=development
+CORS_ALLOW_ORIGINS=http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
 
-# Frontend Configuration (in frontend/.env.local)
+# Database Configuration
+DATABASE_PATH=data/stock_data.db
+YF_CACHE_DIR=.cache/yf
+
+# Logging
+LOG_LEVEL=INFO
+```
+
+**Example frontend/.env.local file:**
+```env
+# Frontend Configuration
 VITE_API_BASE=http://localhost:8000
+VITE_API_TIMEOUT=10000
+VITE_APP_NAME=AI Stock Trading System
+VITE_ENABLE_DEBUG=true
 ```
 
 ### 3. Installation & Launch
@@ -163,7 +187,7 @@ docker-compose up -d
 - **FastAPI**: Modern Python web framework with automatic API documentation
 - **SQLAlchemy**: Async ORM with SQLite (WAL mode) and PostgreSQL support
 - **Pydantic**: Data validation and serialization
-- **OpenAI**: GPT-4o Mini for AI analysis
+- **OpenAI GPT-4o Mini**: Latest model with modern Chat Completions API
 - **httpx**: Async HTTP client for external APIs
 - **Tenacity**: Retry logic and circuit breakers
 
@@ -292,16 +316,40 @@ curl -X POST http://localhost:8000/api/analysis/AAPL \
 
 ### Development
 ```bash
-make start  # Local development servers
+# Using Make (Recommended)
+make start  # Start both backend and frontend
+
+# Manual FastAPI Backend
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Manual Frontend
+cd frontend  
+pnpm run dev --host 0.0.0.0 --port 5173
 ```
 
-### Production with Docker
+### Production Deployment
+
+**Option 1: Docker (Recommended)**
 ```bash
 # Build and deploy
 docker-compose -f docker-compose.prod.yml up -d
 
 # With custom environment
 docker-compose --env-file .env.prod up -d
+```
+
+**Option 2: Manual Production Setup**
+```bash
+# Backend with Gunicorn
+cd backend
+pip install "gunicorn[standard]" uvicorn
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app -b 0.0.0.0:8000
+
+# Frontend build
+cd frontend
+pnpm run build
+# Serve dist/ with nginx or similar
 ```
 
 ### Environment-Specific Recommendations

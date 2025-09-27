@@ -43,6 +43,10 @@ async def lifespan(app: FastAPI):
     if settings.OPENAI_API_KEY:
         openai_client = OpenAIClient(settings.OPENAI_API_KEY)
         logger.info("OpenAI client initialized")
+        
+        # Set OpenAI client for routers
+        from .routers import stocks
+        stocks.set_openai_client(openai_client)
     else:
         logger.warning("OpenAI API key not configured")
     
@@ -60,7 +64,19 @@ app = FastAPI(
 )
 
 # Configure CORS origins from environment
-cors_origins = settings.CORS_ALLOW_ORIGINS.split(",") if settings.CORS_ALLOW_ORIGINS else ["*"]
+cors_origins = []
+if settings.CORS_ALLOW_ORIGINS:
+    cors_origins = [origin.strip() for origin in settings.CORS_ALLOW_ORIGINS.split(",")]
+else:
+    # Default development origins
+    cors_origins = [
+        "http://localhost:5173",
+        "http://localhost:3000", 
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000"
+    ]
+
+logger.info(f"CORS origins configured: {cors_origins}")
 
 # CORS middleware
 app.add_middleware(
@@ -114,6 +130,13 @@ async def health_check():
             }
         )
 
+# Include API routers
+from .routers import stocks, portfolio
+
+# Include routers
+app.include_router(stocks.router)
+app.include_router(portfolio.router)
+
 @app.get("/api/config")
 async def get_client_config():
     """Get client-safe configuration"""
@@ -127,86 +150,6 @@ async def get_client_config():
             "real_time_data": True
         },
         "version": "1.1.0"
-    }
-
-@app.get("/api/stocks/{symbol}")
-async def get_stock_data(symbol: str):
-    """Get stock data for a symbol"""
-    try:
-        from .utils.stock_data import stock_fetcher
-        return await stock_fetcher.get_stock_data(symbol)
-    except Exception as e:
-        logger.error(f"Error fetching stock data for {symbol}: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch data for {symbol}"
-        )
-
-@app.post("/api/analysis/{symbol}", response_model=StockAnalysisResponse)
-async def analyze_stock(symbol: str, request: Optional[StockAnalysisRequest] = None):
-    """Analyze stock using AI agents"""
-    if not openai_client:
-        raise HTTPException(
-            status_code=503,
-            detail="AI analysis service not available. OpenAI API key not configured."
-        )
-    
-    try:
-        # Get stock data first
-        stock_data = await get_stock_data(symbol)
-        
-        # Prepare analysis prompt
-        prompt = f"""
-        Analyze the stock {symbol} with the following data:
-        Price: ${stock_data['price']}
-        Change: {stock_data['change']} ({stock_data['change_percent']}%)
-        
-        Provide a comprehensive analysis including:
-        1. Overall recommendation (BUY/HOLD/SELL)
-        2. Confidence score (0.0-1.0)
-        3. Target price
-        4. Key factors
-        5. Risk assessment
-        
-        Respond in JSON format.
-        """
-        
-        # Get AI analysis
-        ai_response = await openai_client.analyze_stock(prompt)
-        
-        # Parse and structure response
-        return StockAnalysisResponse(
-            symbol=symbol.upper(),
-            recommendation=ai_response.get("recommendation", "HOLD"),
-            confidence=ai_response.get("confidence", 0.5),
-            target_price=ai_response.get("target_price", stock_data["price"]),
-            analysis={
-                "optimistic": {"score": 0.7, "reasoning": "Growth potential identified"},
-                "pessimistic": {"score": 0.6, "reasoning": "Market volatility concerns"},
-                "risk_manager": {"score": 0.65, "reasoning": "Moderate risk profile"}
-            },
-            timestamp=datetime.now().isoformat(),
-            model_used=settings.OPENAI_MODEL
-        )
-        
-    except Exception as e:
-        logger.error(f"Error analyzing stock {symbol}: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to analyze {symbol}: {str(e)}"
-        )
-
-@app.get("/api/portfolio/summary")
-async def get_portfolio_summary():
-    """Get portfolio summary"""
-    # TODO: Implement actual portfolio logic
-    return {
-        "total_value": 50000.00,
-        "daily_change": 1250.50,
-        "daily_change_percent": 2.56,
-        "positions": 8,
-        "cash": 5000.00,
-        "timestamp": datetime.now().isoformat()
     }
 
 if __name__ == "__main__":
