@@ -42,12 +42,13 @@ set +a
 # Create data directory if it doesn't exist
 mkdir -p data logs
 
-echo "🌐 Starting Flask server..."
+echo "🌐 Starting FastAPI server with Uvicorn..."
 echo "Backend will be available at: http://localhost:${BACKEND_PORT:-8000}"
+echo "API Documentation: http://localhost:${BACKEND_PORT:-8000}/docs"
 echo "Health check: http://localhost:${BACKEND_PORT:-8000}/health"
 echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""
 
-# Start the Flask server
+# Start the FastAPI server with Uvicorn
 python main.py

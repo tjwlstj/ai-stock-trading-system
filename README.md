@@ -93,10 +93,15 @@ make start    # Start both backend and frontend
 
 **Option B: Manual Setup**
 ```bash
-# Backend
+# Backend (FastAPI with Uvicorn)
 cd backend
 pip install -r requirements.txt
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# Development mode (with auto-reload)
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Or use the main.py entry point
+python main.py
 
 # Frontend (in new terminal)
 cd frontend

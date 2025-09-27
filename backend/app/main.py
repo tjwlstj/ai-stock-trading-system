@@ -33,6 +33,11 @@ async def lifespan(app: FastAPI):
     
     # Startup
     logger.info("Starting AI Stock Trading System Backend")
+    
+    # Initialize required directories
+    from .utils.directories import initialize_app_directories
+    initialize_app_directories()
+    
     await init_db()
     
     if settings.OPENAI_API_KEY:
@@ -128,18 +133,8 @@ async def get_client_config():
 async def get_stock_data(symbol: str):
     """Get stock data for a symbol"""
     try:
-        # TODO: Implement actual stock data fetching
-        # For now, return mock data
-        return {
-            "symbol": symbol.upper(),
-            "price": 150.25,
-            "change": 2.35,
-            "change_percent": 1.59,
-            "volume": 1234567,
-            "market_cap": "2.5T",
-            "timestamp": datetime.now().isoformat(),
-            "source": "mock_data"
-        }
+        from .utils.stock_data import stock_fetcher
+        return await stock_fetcher.get_stock_data(symbol)
     except Exception as e:
         logger.error(f"Error fetching stock data for {symbol}: {str(e)}")
         raise HTTPException(

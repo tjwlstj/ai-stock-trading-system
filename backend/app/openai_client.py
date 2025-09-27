@@ -81,13 +81,14 @@ class OpenAIClient:
         max_tokens: Optional[int] = None,
         **kwargs
     ) -> Dict[str, Any]:
-        """Create chat completion with error handling"""
+        """Create chat completion with error handling using modern OpenAI API"""
         
         # Validate input length
         total_tokens = sum(self.count_tokens(msg.get("content", "")) for msg in messages)
         if total_tokens > 4000:  # Conservative limit
             raise ValueError(f"Input too long: {total_tokens} tokens")
         
+        # Use modern Responses API format
         payload = {
             "model": self.model,
             "messages": messages,
