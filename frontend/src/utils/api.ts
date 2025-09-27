@@ -1,6 +1,6 @@
 /**
  * API Client Utility
- * 백엔드 API와의 통신을 담당하는 유틸리티
+ * 백엔드 API와의 통신을 담당하는 유틸리티 (TypeScript)
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
