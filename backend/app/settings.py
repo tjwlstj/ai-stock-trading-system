@@ -35,10 +35,10 @@ class Settings(BaseModel):
     YAHOO_FINANCE_TIMEOUT: int = int(os.getenv("YAHOO_FINANCE_TIMEOUT", "10"))
     
     # CORS Configuration
-    CORS_ALLOW_ORIGINS: List[str] = os.getenv(
-        "CORS_ORIGINS", 
+    CORS_ALLOW_ORIGINS: str = os.getenv(
+        "CORS_ALLOW_ORIGINS", 
         "http://localhost:3000,http://localhost:5173"
-    ).split(",")
+    )
     
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")

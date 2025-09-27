@@ -1,229 +1,311 @@
-# AI Stock Trading System 🤖📈
+# 🤖 AI Stock Trading System
 
-**Multi-Agent AI-Powered Stock Analysis and Trading System**
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-red.svg)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A comprehensive stock trading system powered by multiple AI agents that provide different perspectives on market analysis, risk assessment, and investment decisions.
+> **⚠️ Research & Educational Tool Only**  
+> This system is designed for market analysis and educational purposes. It does NOT execute trades or provide financial advice.
 
-## 🌟 Features
+A sophisticated AI-powered stock analysis system that combines multiple data sources with advanced language models to provide comprehensive market insights and research capabilities.
 
-### 🤖 Multi-Agent AI Analysis
-- **Optimistic Analyst**: Focuses on growth opportunities and positive market signals
-- **Pessimistic Analyst**: Identifies risks and potential downside scenarios  
-- **Risk Manager**: Provides portfolio risk assessment and position sizing recommendations
-- **Agent Coordinator**: Integrates multiple AI perspectives for final investment decisions
+## ✨ Features
 
-### 📊 Real-Time Dashboard
-- Portfolio performance tracking with interactive charts
-- Near real-time market data integration (with potential delays)
-- AI agent status monitoring
-- Sector allocation visualization
+### 🧠 **Multi-Agent AI Analysis**
+- **GPT-4o Mini Integration**: Advanced natural language processing for market analysis
+- **Consensus-Based Decisions**: Multiple AI agents provide weighted recommendations
+- **Technical & Fundamental Analysis**: Comprehensive evaluation of market conditions
+- **Risk Assessment**: Intelligent risk profiling and scenario analysis
 
-### 💼 Portfolio Management
-- Comprehensive position tracking
-- AI-powered rebalancing suggestions
-- Performance analytics and metrics
-- Risk-adjusted recommendations
+### 📊 **Real-Time Market Data**
+- **Near Real-Time Quotes**: Yahoo Finance integration with smart caching (15-20 min delay)
+- **Market Hours Awareness**: Intelligent data freshness based on trading sessions
+- **Multi-Exchange Support**: US, UK, Japan, Hong Kong, and Chinese markets
+- **Fallback Mechanisms**: Robust error handling and data source redundancy
 
-### ⚙️ Advanced Configuration
-- OpenAI API integration for AI analysis
-- Customizable risk management parameters
-- Flexible notification settings
-- Cloud storage and data backup
+### 🏗️ **Production-Ready Architecture**
+- **FastAPI Backend**: High-performance async API with automatic documentation
+- **React Frontend**: Modern, responsive user interface with real-time updates
+- **SQLite with WAL Mode**: Optimized database with concurrent access support
+- **Docker Support**: Containerized deployment with docker-compose
 
-## 🏗️ Architecture
-
-```
-ai-stock-trading-system/
-├── backend/                 # Python backend services
-│   ├── data_collector.py   # Stock data collection (Yahoo Finance)
-│   ├── database.py         # SQLite database management
-│   └── cloud_storage.py    # Cloud storage integration
-├── agents/                 # AI agent modules
-│   ├── base_agent.py       # Base AI agent class
-│   ├── optimistic_agent.py # Optimistic analysis agent
-│   ├── pessimistic_agent.py# Pessimistic analysis agent
-│   ├── risk_manager.py     # Risk management agent
-│   └── agent_coordinator.py# Multi-agent coordinator
-├── frontend/               # React web interface
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── StockAnalysis.jsx
-│   │   │   ├── Portfolio.jsx
-│   │   │   └── Settings.jsx
-│   │   └── App.jsx         # Main application
-│   └── package.json
-└── README.md
-```
+### 🔒 **Enterprise Security**
+- **Environment-Based Configuration**: Secure API key management
+- **Input Validation**: Comprehensive request/response validation with Pydantic
+- **Rate Limiting**: API protection against abuse
+- **Audit Logging**: Complete activity tracking for compliance
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.11+
-- Node.js 20+ (LTS recommended)
-- OpenAI API Key (for AI analysis)
 
-### Backend Setup
+- **Python 3.11+** (recommended: 3.11 or 3.12)
+- **Node.js 20+** (LTS version recommended)
+- **pnpm** (package manager)
+
+### 1. Environment Setup
+
 ```bash
+# Clone the repository
+git clone https://github.com/tjwlstj/ai-stock-trading-system.git
+cd ai-stock-trading-system
+
+# Verify environment
+./scripts/verify_env.sh
+```
+
+### 2. Configuration
+
+```bash
+# Copy environment templates
+cp .env.example .env
+cp frontend/.env.example frontend/.env.local
+
+# Edit .env and add your API keys
+nano .env
+```
+
+**Required Environment Variables:**
+```env
+# OpenAI Configuration
+OPENAI_API_KEY=sk-your-openai-key-here
+OPENAI_MODEL=gpt-4o-mini
+OPENAI_TIMEOUT=30
+OPENAI_MAX_RETRY=5
+
+# Backend Configuration
+BACKEND_PORT=8000
+CORS_ALLOW_ORIGINS=http://localhost:3000,http://localhost:5173
+
+# Frontend Configuration (in frontend/.env.local)
+VITE_API_BASE=http://localhost:8000
+```
+
+### 3. Installation & Launch
+
+**Option A: Using Make (Recommended)**
+```bash
+make setup    # Install dependencies
+make start    # Start both backend and frontend
+```
+
+**Option B: Manual Setup**
+```bash
+# Backend
 cd backend
 pip install -r requirements.txt
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-# Start the backend server
-python main.py
-
-# Or for production with gunicorn
-# pip install gunicorn
-# gunicorn -w 4 -b 0.0.0.0:8000 main:app
-```
-
-### Frontend Setup
-```bash
+# Frontend (in new terminal)
 cd frontend
 pnpm install
-pnpm run dev --host
+pnpm run dev --host 0.0.0.0 --port 5173
 ```
 
-### Environment Variables
-Copy `.env.example` to `.env` and configure your settings:
+**Option C: Docker**
 ```bash
-cp .env.example .env
-# Edit .env with your actual API keys and configuration
+docker-compose up -d
 ```
 
-**Important**: Never commit your `.env` file to version control!
+### 4. Access the Application
 
-For frontend configuration, copy `frontend/.env.example` to `frontend/.env.local`:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
+
+## 📖 Documentation
+
+### Core Guides
+- 📋 **[API Documentation](API_DOCUMENTATION.md)** - Complete API reference with examples
+- 🗄️ **[Database Guide](DATABASE_GUIDE.md)** - SQLite optimization & PostgreSQL migration
+- 🧪 **[Testing Guide](TESTING_GUIDE.md)** - Comprehensive testing strategies
+- 🔒 **[Security Guide](SECURITY_GUIDE.md)** - Security best practices & compliance
+- 🎨 **[Frontend Guide](FRONTEND_GUIDE.md)** - UI/UX patterns & React best practices
+
+### Quick References
+- 🔧 **Configuration**: Environment variables and settings
+- 🐳 **Docker**: Containerized deployment options
+- 📊 **Monitoring**: Health checks and performance metrics
+- 🚨 **Troubleshooting**: Common issues and solutions
+
+## 🏛️ Architecture
+
+### System Overview
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React Frontend │    │  FastAPI Backend │    │  External APIs  │
+│                 │    │                 │    │                 │
+│ • Dashboard     │◄──►│ • Stock Data    │◄──►│ • Yahoo Finance │
+│ • Analysis UI   │    │ • AI Analysis   │    │ • OpenAI GPT    │
+│ • Portfolio     │    │ • Portfolio Mgmt│    │ • Market Data   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                              │
+                              ▼
+                       ┌─────────────────┐
+                       │  SQLite Database │
+                       │                 │
+                       │ • Stock Quotes  │
+                       │ • Analysis Data │
+                       │ • User Portfolio│
+                       └─────────────────┘
+```
+
+### Technology Stack
+
+**Backend**
+- **FastAPI**: Modern Python web framework with automatic API documentation
+- **SQLAlchemy**: Async ORM with SQLite (WAL mode) and PostgreSQL support
+- **Pydantic**: Data validation and serialization
+- **OpenAI**: GPT-4o Mini for AI analysis
+- **httpx**: Async HTTP client for external APIs
+- **Tenacity**: Retry logic and circuit breakers
+
+**Frontend**
+- **React 18**: Modern UI library with hooks and concurrent features
+- **TypeScript**: Type-safe JavaScript development
+- **Vite**: Fast build tool and development server
+- **Tailwind CSS**: Utility-first CSS framework
+- **Recharts**: Responsive chart library
+
+**Infrastructure**
+- **Docker**: Containerization and deployment
+- **SQLite**: Default database with WAL mode optimization
+- **PostgreSQL**: Production database option
+- **GitHub Actions**: CI/CD pipeline (optional)
+
+## 🔧 Configuration Reference
+
+### Backend Settings
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OPENAI_API_KEY` | - | **Required**: OpenAI API key for AI analysis |
+| `OPENAI_MODEL` | `gpt-4o-mini` | OpenAI model for analysis |
+| `OPENAI_TIMEOUT` | `30` | API timeout in seconds |
+| `OPENAI_MAX_RETRY` | `5` | Maximum retry attempts |
+| `BACKEND_PORT` | `8000` | Backend server port |
+| `DATABASE_PATH` | `data/stock_data.db` | SQLite database file path |
+| `CORS_ALLOW_ORIGINS` | `http://localhost:3000,http://localhost:5173` | Allowed frontend origins |
+| `LOG_LEVEL` | `INFO` | Logging level (DEBUG, INFO, WARNING, ERROR) |
+
+### Frontend Settings
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_API_BASE` | `http://localhost:8000` | Backend API URL |
+| `VITE_API_TIMEOUT` | `10000` | API request timeout (ms) |
+| `VITE_APP_NAME` | `AI Stock Trading System` | Application name |
+
+### Database Configuration
+
+**SQLite (Default)**
+- ✅ **WAL Mode**: Enabled for better concurrent access
+- ✅ **Optimized Settings**: Cache size, synchronous mode, foreign keys
+- ⚠️ **Concurrency**: Limited to ~100 concurrent users
+- 📝 **Note**: For production with high concurrency, consider PostgreSQL
+
+**PostgreSQL (Production)**
+```env
+DB_URL=postgresql://username:password@localhost:5432/stock_trading
+DATABASE_TYPE=postgresql
+DB_POOL_SIZE=20
+DB_MAX_OVERFLOW=30
+```
+
+## 🧪 Testing
+
+### Running Tests
 ```bash
-cd frontend
-cp .env.example .env.local
-# Configure frontend-specific settings
+# All tests
+make test
+
+# Specific test categories
+pytest tests/unit/          # Unit tests
+pytest tests/integration/   # Integration tests
+pytest tests/e2e/          # End-to-end tests
+
+# With coverage
+pytest --cov=backend/app --cov-report=html
 ```
 
-## 🤖 AI Agents Overview
+### Test Structure
+- **Unit Tests**: Individual component testing
+- **Integration Tests**: API endpoint testing
+- **E2E Tests**: Complete workflow testing
+- **Performance Tests**: Load and stress testing
 
-### 1. Optimistic Analyst
-- **Focus**: Growth potential and positive market indicators
-- **Strengths**: Identifying breakout opportunities and momentum
-- **Typical Recommendations**: BUY signals for growth stocks
+## 📊 API Endpoints
 
-### 2. Pessimistic Analyst  
-- **Focus**: Risk factors and market vulnerabilities
-- **Strengths**: Downside protection and risk identification
-- **Typical Recommendations**: SELL/HOLD signals during uncertainty
+### Core Endpoints
 
-### 3. Risk Manager
-- **Focus**: Portfolio risk assessment and position sizing
-- **Strengths**: Volatility analysis and risk-adjusted returns
-- **Outputs**: Position size recommendations, stop-loss levels
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | System health check |
+| `GET` | `/api/config` | Client configuration |
+| `GET` | `/api/stocks/{symbol}` | Stock quote data |
+| `POST` | `/api/analysis/{symbol}` | AI stock analysis |
+| `GET` | `/api/portfolio/summary` | Portfolio overview |
+| `POST` | `/api/stocks/batch` | Multiple stock quotes |
 
-### 4. Agent Coordinator
-- **Function**: Integrates all agent analyses for final decisions
-- **Process**: Weighted consensus building with conflict resolution
-- **Output**: Final investment recommendations with confidence scores
+### Example Usage
 
-## 📈 Usage Examples
-
-### Stock Analysis
-```python
-from agents.agent_coordinator import AgentCoordinator
-
-coordinator = AgentCoordinator(api_key="your_openai_key")
-analysis = coordinator.analyze_stock_comprehensive("AAPL")
-
-print(f"Recommendation: {analysis['final_recommendation']}")
-print(f"Confidence: {analysis['confidence']:.2%}")
-print(f"Target Price: ${analysis['target_price']}")
+**Get Stock Quote**
+```bash
+curl http://localhost:8000/api/stocks/AAPL
 ```
 
-### Portfolio Analysis
-```python
-portfolio_symbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA']
-portfolio_analysis = coordinator.analyze_portfolio(portfolio_symbols)
-
-for symbol, result in portfolio_analysis['individual_analyses'].items():
-    print(f"{symbol}: {result['final_recommendation']} ({result['confidence']:.2%})")
+**Request AI Analysis**
+```bash
+curl -X POST http://localhost:8000/api/analysis/AAPL \
+  -H "Content-Type: application/json" \
+  -d '{"analysis_type": "comprehensive"}'
 ```
 
-## 🛠️ Technology Stack
+## 🔒 Security & Compliance
 
-### Backend
-- **Python 3.11**: Core backend language
-- **SQLite**: Local database for data storage
-- **OpenAI API**: AI-powered analysis
-- **Yahoo Finance API**: Real-time stock data
-- **Pandas**: Data manipulation and analysis
+### Security Features
+- 🔐 **API Key Protection**: Backend-only secret management
+- 🛡️ **Input Validation**: Comprehensive request validation
+- 🚫 **Prompt Injection Prevention**: AI input sanitization
+- 📝 **Audit Logging**: Complete activity tracking
+- 🔄 **Rate Limiting**: API abuse protection
 
-### Frontend
-- **React 18**: Modern web interface
-- **Tailwind CSS**: Utility-first styling
-- **Recharts**: Interactive data visualization
-- **Lucide Icons**: Beautiful icon library
-- **Vite**: Fast build tool and dev server
+### Compliance Notes
+- 📊 **Research Tool**: For analysis and educational purposes only
+- 🚫 **Not Financial Advice**: All outputs are informational
+- 📈 **No Trading Automation**: Does not execute trades
+- ⚖️ **User Responsibility**: Users make their own investment decisions
 
-### AI & ML
-- **OpenAI GPT-4**: Natural language processing for market analysis
-- **Multi-Agent Architecture**: Distributed AI decision making
-- **Consensus Algorithms**: Weighted voting and conflict resolution
-
-## 📊 Key Metrics & Features
-
-### Performance Tracking
-- Real-time portfolio valuation
-- Daily/weekly/monthly performance
-- Benchmark comparison (S&P 500)
-- Risk-adjusted returns (Sharpe ratio)
-
-### Risk Management
-- Position sizing recommendations
-- Stop-loss level calculations
-- Portfolio volatility monitoring
-- Maximum drawdown tracking
-
-### AI Confidence Scoring
-- Individual agent confidence levels
-- Consensus agreement metrics
-- Conflict identification and resolution
-- Historical accuracy tracking
-
-## 🔧 Configuration Options
-
-### Risk Parameters
-- Maximum position size (default: 10%)
-- Stop-loss percentage (default: 5%)
-- Take-profit percentage (default: 15%)
-- Confidence threshold (default: 70%)
-
-### AI Agent Settings
-- Analysis frequency (real-time to daily)
-- Agent enable/disable toggles
-- Custom prompt templates
-- Response timeout settings
-
-### Data Management
-- Data retention period (default: 90 days)
-- Cloud backup configuration
-- Local storage optimization
-- API rate limiting
+### Data Sources & Disclaimers
+- **Stock Data**: Yahoo Finance (delayed 15-20 minutes)
+- **AI Analysis**: OpenAI GPT models (not real-time)
+- **Market Hours**: Data freshness varies by trading session
 
 ## 🚀 Deployment
 
-### Local Development
+### Development
 ```bash
-# Backend
-cd backend && python -m flask run
-
-# Frontend  
-cd frontend && pnpm run dev --host
+make start  # Local development servers
 ```
 
-### Production Build
+### Production with Docker
 ```bash
-# Build frontend
-cd frontend && pnpm run build
+# Build and deploy
+docker-compose -f docker-compose.prod.yml up -d
 
-# Deploy to cloud platform of choice
-# (Vercel, Netlify, AWS, etc.)
+# With custom environment
+docker-compose --env-file .env.prod up -d
 ```
+
+### Environment-Specific Recommendations
+
+| Environment | Database | Deployment | Monitoring |
+|-------------|----------|------------|------------|
+| **Development** | SQLite | Local | Basic logging |
+| **Staging** | SQLite/PostgreSQL | Docker | Health checks |
+| **Production** | PostgreSQL | Docker + Load Balancer | Full monitoring |
 
 ## 🤝 Contributing
 
@@ -233,30 +315,30 @@ cd frontend && pnpm run build
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+### Development Guidelines
+- Follow Python PEP 8 and TypeScript best practices
+- Write tests for new features
+- Update documentation for API changes
+- Use conventional commit messages
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## ⚠️ Disclaimer
+## 🆘 Support
 
-This system is for educational and research purposes only. It should not be used as the sole basis for investment decisions. Always consult with qualified financial advisors and conduct your own research before making investment decisions. Past performance does not guarantee future results.
+- 📖 **Documentation**: Check the guides in the `/docs` directory
+- 🐛 **Issues**: Report bugs on GitHub Issues
+- 💬 **Discussions**: Join GitHub Discussions for questions
+- 📧 **Contact**: For enterprise support, contact the maintainers
 
 ## 🙏 Acknowledgments
 
-- OpenAI for providing the GPT API for AI analysis
-- Yahoo Finance for real-time market data
-- The open-source community for various libraries and tools
-- React and Tailwind CSS teams for excellent development frameworks
-
-## 📞 Support
-
-For questions, issues, or contributions, please:
-- Open an issue on GitHub
-- Contact the development team
-- Check the documentation wiki
+- **OpenAI** for GPT models and API
+- **Yahoo Finance** for market data
+- **FastAPI** and **React** communities
+- All contributors and users of this project
 
 ---
 
-**Built with ❤️ by the AI Trading System Team**
-
-*Empowering intelligent investment decisions through multi-agent AI analysis*
+**⚠️ Important Disclaimer**: This system is for research and educational purposes only. It does not provide financial advice and does not execute trades. Users are responsible for their own investment decisions. All data may be delayed or inaccurate.
