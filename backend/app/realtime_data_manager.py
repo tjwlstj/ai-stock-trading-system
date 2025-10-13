@@ -13,7 +13,15 @@ import pytz
 from dataclasses import dataclass, asdict
 import hashlib
 
-import redis
+from typing import TYPE_CHECKING
+
+try:
+    from redis.asyncio import Redis as AsyncRedis
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - optional dependency
+    AsyncRedis = None  # type: ignore
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from redis.asyncio import Redis as AsyncRedis
 import yfinance as yf
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
@@ -173,7 +181,7 @@ class MarketHoursManager:
 class SmartCache:
     """Intelligent caching system with market-aware TTL"""
     
-    def __init__(self, redis_client: Optional[redis.Redis] = None):
+    def __init__(self, redis_client: Optional["AsyncRedis"] = None):
         self.redis_client = redis_client
         self.market_manager = MarketHoursManager()
         self.local_cache: Dict[str, Tuple[StockQuote, datetime]] = {}
@@ -192,8 +200,16 @@ class SmartCache:
         if self.redis_client:
             try:
                 cached_data = await self.redis_client.get(cache_key)
+                if isinstance(cached_data, bytes):
+                    cached_data = cached_data.decode("utf-8")
                 if cached_data:
                     data = json.loads(cached_data)
+                    timestamp = data.get('timestamp')
+                    if isinstance(timestamp, str):
+                        try:
+                            data['timestamp'] = datetime.fromisoformat(timestamp)
+                        except ValueError:
+                            data['timestamp'] = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
                     quote = StockQuote(**data)
                     
                     # Check if cache is still fresh
@@ -261,7 +277,7 @@ class SmartCache:
 class MultiSourceDataProvider:
     """Aggregates data from multiple sources with fallback logic"""
     
-    def __init__(self, redis_client: Optional[redis.Redis] = None):
+    def __init__(self, redis_client: Optional["AsyncRedis"] = None):
         self.cache = SmartCache(redis_client)
         self.market_manager = MarketHoursManager()
         self.sources = [
@@ -406,8 +422,16 @@ class MultiSourceDataProvider:
             try:
                 # Look for expired cache entries
                 cached_data = await self.cache.redis_client.get(f"{cache_key}:stale")
+                if isinstance(cached_data, bytes):
+                    cached_data = cached_data.decode("utf-8")
                 if cached_data:
                     data = json.loads(cached_data)
+                    timestamp = data.get('timestamp')
+                    if isinstance(timestamp, str):
+                        try:
+                            data['timestamp'] = datetime.fromisoformat(timestamp)
+                        except ValueError:
+                            data['timestamp'] = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
                     return StockQuote(**data)
             except Exception:
                 pass
@@ -477,7 +501,7 @@ class YahooFinanceProvider:
 class RealTimeDataManager:
     """Main interface for real-time data management"""
     
-    def __init__(self, redis_client: Optional[redis.Redis] = None):
+    def __init__(self, redis_client: Optional["AsyncRedis"] = None):
         self.data_provider = MultiSourceDataProvider(redis_client)
         self.market_manager = MarketHoursManager()
         self.subscribers = {}  # For WebSocket subscriptions
