@@ -6,13 +6,19 @@ Provides comprehensive cost tracking, budget controls, and optimization strategi
 import asyncio
 import logging
 from datetime import datetime, timedelta, date
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING
 from enum import Enum
 from dataclasses import dataclass, asdict
 import json
 from decimal import Decimal, ROUND_HALF_UP
 
-import redis
+try:
+    from redis.asyncio import Redis as AsyncRedis
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - optional dependency
+    AsyncRedis = None  # type: ignore
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from redis.asyncio import Redis as AsyncRedis
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -73,7 +79,7 @@ class UsageStats:
 class CostTracker:
     """Tracks and records all system costs"""
     
-    def __init__(self, redis_client: Optional[redis.Redis] = None):
+    def __init__(self, redis_client: Optional["AsyncRedis"] = None):
         self.redis_client = redis_client
         self.local_costs: List[CostEntry] = []
         self.max_local_entries = 1000
@@ -222,6 +228,8 @@ class CostTracker:
                     
                     entries = await self.redis_client.lrange(redis_key, 0, -1)
                     for entry_json in entries:
+                        if isinstance(entry_json, bytes):
+                            entry_json = entry_json.decode('utf-8')
                         entry_data = json.loads(entry_json)
                         entry_data['timestamp'] = datetime.fromisoformat(entry_data['timestamp'])
                         entry_data['amount'] = Decimal(entry_data['amount'])
@@ -253,7 +261,7 @@ class CostTracker:
 class BudgetManager:
     """Manages budget limits and alerts"""
     
-    def __init__(self, cost_tracker: CostTracker, redis_client: Optional[redis.Redis] = None):
+    def __init__(self, cost_tracker: CostTracker, redis_client: Optional["AsyncRedis"] = None):
         self.cost_tracker = cost_tracker
         self.redis_client = redis_client
         self.budget_limits: Dict[str, BudgetLimit] = {}

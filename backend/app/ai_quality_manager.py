@@ -7,7 +7,7 @@ import json
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING
 from dataclasses import dataclass
 from enum import Enum
 import hashlib
@@ -16,7 +16,13 @@ from functools import lru_cache
 import re
 
 from pydantic import BaseModel, validator
-import redis
+try:
+    from redis.asyncio import Redis as AsyncRedis
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - optional dependency
+    AsyncRedis = None  # type: ignore
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from redis.asyncio import Redis as AsyncRedis
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger(__name__)
@@ -194,7 +200,7 @@ class AIResponseValidator:
 class AIUsageOptimizer:
     """Optimizes AI API usage for cost efficiency"""
     
-    def __init__(self, redis_client: Optional[redis.Redis] = None):
+    def __init__(self, redis_client: Optional["AsyncRedis"] = None):
         self.redis_client = redis_client
         self.cache_ttl = {
             AnalysisLevel.QUICK: 3600,      # 1 hour
@@ -218,6 +224,8 @@ class AIUsageOptimizer:
         
         try:
             cached_data = await self.redis_client.get(cache_key)
+            if isinstance(cached_data, bytes):
+                cached_data = cached_data.decode("utf-8")
             if cached_data:
                 result = json.loads(cached_data)
                 result['is_cached'] = True
@@ -315,7 +323,7 @@ class AIUsageOptimizer:
 class AIQualityMonitor:
     """Monitors AI response quality and system performance"""
     
-    def __init__(self, redis_client: Optional[redis.Redis] = None):
+    def __init__(self, redis_client: Optional["AsyncRedis"] = None):
         self.redis_client = redis_client
         self.metrics = AIUsageMetrics()
         self.quality_thresholds = {
