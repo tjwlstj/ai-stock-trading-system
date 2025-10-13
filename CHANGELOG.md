@@ -5,6 +5,80 @@ All notable changes to the AI Stock Trading System will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-10-13
+
+### Added
+- Comprehensive async Redis client support across backend modules
+- New test suite for async Redis functionality (`tests/test_async_redis_clients.py` - 154 lines)
+- AsyncFakeRedis mock class for testing without actual Redis instance
+- Market time calculation test suite (`test_market_time.py` - 37 lines)
+- Helper methods for market trading day validation and date advancement
+  - `_next_calendar_day()`: Safe date increment using timedelta
+  - `_is_trading_day()`: Weekend and holiday validation
+  - `_advance_to_next_trading_day()`: Intelligent trading day navigation
+
+### Changed
+- **Breaking**: Migrated Redis clients from synchronous to asynchronous (`redis.asyncio.Redis`)
+  - Updated `backend/app/ai_quality_manager.py` (AIUsageOptimizer, AIQualityMonitor)
+  - Updated `backend/app/cost_optimizer.py` (CostTracker, BudgetManager)
+  - Updated `backend/app/realtime_data_manager.py` (SmartCache, MultiSourceDataProvider, RealTimeDataManager)
+- Improved type hints using `TYPE_CHECKING` for better IDE support and optional dependency handling
+- Refactored `next_market_open()` logic in `backend/app/utils/market_time.py`
+  - Replaced complex while loops with dedicated helper methods
+  - Improved code readability and maintainability
+  - Eliminated manual date arithmetic errors
+
+### Fixed
+- **Critical**: Fixed date rollover bug in market session calculations
+  - Resolved month-end boundary issues (e.g., Jan 31 → Feb 1)
+  - Resolved year-end holiday handling (e.g., Dec 31 → Jan 2)
+  - Fixed Independence Day and other holiday skip logic
+  - Prevented incorrect date calculations using `timedelta(days=1)`
+- Added proper bytes decoding for Redis cached data
+- Improved timestamp parsing with ISO format fallback handling (handles both standard and 'Z' suffix)
+- Fixed potential data type issues in Redis responses (bytes vs string)
+
+### Performance
+- Enhanced system scalability through async I/O operations
+- Improved Redis response handling with proper encoding/decoding
+- Reduced blocking operations in data access layers
+
+### Testing
+- Added 154 lines of async Redis client tests covering:
+  - SmartCache async operations
+  - AIQualityMonitor metrics recording
+  - AIUsageOptimizer graceful degradation without Redis
+  - CostTracker async storage operations
+- Added 37 lines of market time calculation tests covering:
+  - Month-end rollover scenarios
+  - Year-end holiday handling
+  - Independence Day and special holiday cases
+
+### Technical Details
+
+**Commit Information**:
+- Latest Commit: `e7d4e9b416276953bd2e77480c93c32abbfad44f`
+- Commit Date: 2025-10-13 10:09:21 +0900
+- Merged PRs: 
+  - #2: Fix market session next open rollover handling
+  - #1: Switch backend Redis usage to redis.asyncio
+
+**File Statistics**:
+- Total files changed: 6
+- Lines added: 270
+- Lines deleted: 34
+- New files created: 2
+
+**Dependencies**:
+- Requires `redis-py` with asyncio support (`redis.asyncio`)
+- Python 3.7+ for async/await support
+- Compatible with existing synchronous codebase through gradual migration
+
+**Migration Notes**:
+- All Redis client instantiations now use `AsyncRedis` type hint
+- Redis operations are now awaitable (use `await` keyword)
+- Backward compatibility maintained through optional Redis client parameters
+
 ## [1.1.0] - 2025-09-27
 
 ### Added
