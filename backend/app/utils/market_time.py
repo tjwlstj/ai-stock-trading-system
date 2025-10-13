@@ -4,7 +4,7 @@ Handle market hours, holidays, and trading sessions
 """
 
 import pytz
-from datetime import datetime, time, date
+from datetime import datetime, time, date, timedelta
 from typing import Dict, List, Optional, Tuple
 import logging
 
@@ -91,7 +91,26 @@ class MarketSession:
     def is_market_closed(self, dt: Optional[datetime] = None) -> bool:
         """Check if market is currently closed"""
         return not self.is_market_open(dt)
-    
+
+    def _next_calendar_day(self, current_date: date) -> date:
+        """Return the next calendar day"""
+        return current_date + timedelta(days=1)
+
+    def _is_trading_day(self, current_date: date) -> bool:
+        """Determine if the given date is a valid trading day"""
+        if current_date.weekday() >= 5:
+            return False
+        if self.market in ['NYSE', 'NASDAQ'] and current_date in ALL_US_HOLIDAYS:
+            return False
+        return True
+
+    def _advance_to_next_trading_day(self, current_date: date, include_current: bool = False) -> date:
+        """Advance to the next trading day, optionally considering the current date"""
+        candidate = current_date if include_current else self._next_calendar_day(current_date)
+        while not self._is_trading_day(candidate):
+            candidate = self._next_calendar_day(candidate)
+        return candidate
+
     def next_market_open(self, dt: Optional[datetime] = None) -> datetime:
         """Get the next market open time"""
         if dt is None:
@@ -101,27 +120,13 @@ class MarketSession:
         else:
             dt = dt.astimezone(self.timezone)
         
-        # Start from the next day if market is closed today
         current_date = dt.date()
-        
-        # If market is still open today, next open is tomorrow
-        if self.is_market_open(dt):
-            current_date = date(current_date.year, current_date.month, current_date.day + 1)
-        
-        # Find next trading day
-        while True:
-            # Skip weekends
-            if current_date.weekday() >= 5:
-                current_date = date(current_date.year, current_date.month, current_date.day + 1)
-                continue
-            
-            # Skip holidays
-            if self.market in ['NYSE', 'NASDAQ'] and current_date in ALL_US_HOLIDAYS:
-                current_date = date(current_date.year, current_date.month, current_date.day + 1)
-                continue
-            
-            break
-        
+
+        if self.is_market_open(dt) or dt.time() >= self.hours['close']:
+            current_date = self._advance_to_next_trading_day(current_date)
+        elif not self._is_trading_day(current_date):
+            current_date = self._advance_to_next_trading_day(current_date, include_current=True)
+
         # Combine date with market open time
         next_open = datetime.combine(current_date, self.hours['open'])
         return self.timezone.localize(next_open)
