@@ -5,6 +5,41 @@ All notable changes to the AI Stock Trading System will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1-beta] - 2025-10-20
+
+### Changed
+- **Backend Dependencies**: Conservative security and stability updates
+  - Updated `fastapi` from 0.115.0 to 0.119.0 (security improvements and bug fixes)
+  - Updated `sqlalchemy` from 2.0.35 to 2.0.43 (security recommendations)
+- **Frontend Dependencies**: Minor stability update
+  - Updated `vite` from 6.3.5 to 6.4.0 (bug fixes and performance improvements)
+
+### Security
+- Applied recommended security patches for FastAPI (ReDoS, CSRF, Information Leakage mitigations)
+- Updated SQLAlchemy to address potential security concerns
+
+### Maintenance
+- Regular dependency audit and security vulnerability assessment
+- Verified pandas 2.2.3 stability (CVE-2024-42992 was rejected/withdrawn)
+- Maintained OpenAI SDK at 1.54.4 (avoiding v2.x breaking changes)
+
+### Technical Details
+
+**Commit Information**:
+- Maintenance Type: Regular inspection and conservative updates
+- Update Strategy: Security-first, backward-compatible changes only
+- Testing: Dependency compatibility verified
+
+**File Statistics**:
+- Files changed: 3 (backend/requirements.txt, frontend/package.json, VERSION)
+- Dependency updates: 3 packages
+- Breaking changes: None
+
+**Version Management**:
+- This is a **beta release** for testing and validation
+- Version naming: 1.2.1-beta (incremental beta versioning)
+- Stable release will be 1.2.1 after validation
+
 ## [1.2.0] - 2025-10-13
 
 ### Added
@@ -137,3 +172,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Yahoo Finance data collection
 - OpenAI API integration
 - Basic portfolio management features
+
