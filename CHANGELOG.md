@@ -5,6 +5,58 @@ All notable changes to the AI Stock Trading System will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2-beta] - 2025-10-27
+
+### Changed
+- **Backend Dependencies**: Conservative minor and patch updates
+  - Updated `fastapi` from 0.119.0 to 0.120.0 (internal documentation migration, no breaking changes)
+  - Updated `sqlalchemy` from 2.0.43 to 2.0.44 (Python 3.14 compatibility, bug fixes)
+  - Updated `pandas` from 2.2.3 to 2.3.3 (minor version update with improvements)
+  - Updated `yfinance` from 0.2.44 to 0.2.66 (bug fixes and stability improvements)
+  - Updated `uvicorn` from 0.30.6 to 0.38.0 (performance and stability improvements)
+  - Updated `pydantic` from 2.9.2 to 2.12.3 (compatibility improvements with FastAPI 0.119+)
+- **Frontend Dependencies**: Security vulnerability fixes
+  - Applied automatic security patches via `pnpm audit --fix`
+  - Fixed `brace-expansion` vulnerability (ESLint dependency)
+  - Fixed `@eslint/plugin-kit` vulnerability
+  - Updated `vite` to 7.1.12 (security patches applied via overrides)
+
+### Security
+- **All known vulnerabilities resolved**: `pnpm audit` now reports zero vulnerabilities
+- Applied security patches for ESLint ecosystem
+- Updated Vite to address file serving and filesystem access vulnerabilities
+
+### Maintenance
+- Regular dependency audit and security vulnerability assessment
+- Maintained OpenAI SDK at 1.54.4 (v2.x migration deferred to separate update cycle)
+- Verified all updates are backward-compatible with no breaking changes
+
+### Technical Details
+
+**Commit Information**:
+- Maintenance Type: Regular inspection and conservative updates
+- Update Strategy: Security-first, backward-compatible changes only
+- Testing: Dependency compatibility verified
+
+**File Statistics**:
+- Files changed: 3 (backend/requirements.txt, frontend/package.json, VERSION)
+- Backend dependency updates: 6 packages
+- Frontend security fixes: 4 vulnerabilities resolved
+- Breaking changes: None
+
+**Version Management**:
+- This is a **beta release** for testing and validation
+- Version naming: 1.2.2-beta (incremental beta versioning)
+- Previous beta: 1.2.1-beta (2025-10-20)
+- Latest stable: 1.2.0 (2025-10-13)
+- Stable release will be 1.2.2 after validation
+
+**Deferred Updates**:
+- OpenAI SDK v2.x migration (major version update with breaking changes)
+  - Current: 1.54.4 (stable and secure)
+  - Latest: 2.6.1 (requires migration effort)
+  - Plan: Separate update cycle with dedicated testing
+
 ## [1.2.1-beta] - 2025-10-20
 
 ### Changed
@@ -172,4 +224,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Yahoo Finance data collection
 - OpenAI API integration
 - Basic portfolio management features
+
 
