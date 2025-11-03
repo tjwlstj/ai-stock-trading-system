@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.2.3-beta] - 2025-11-03
+
+### Changed
+- **Backend Dependencies**: Conservative patch update for bug fixes and stability
+  - Updated `fastapi` from 0.120.0 to 0.120.4
+
+### Fixed
+- Inherited bug fixes from FastAPI `0.120.1` to `0.120.4`:
+  - Fixed an issue with schema separation for nested models introduced in `0.119.0`.
+  - Resolved a bug in OpenAPI generation when security schemes are added at the top-level application.
+
+### Technical Details
+
+**Commit Information**:
+- Maintenance Type: Regular inspection and conservative patch update
+- Update Strategy: Bug-fix-oriented, backward-compatible changes only
+- Testing: Dependency compatibility verified, syntax checks passed
+
+**File Statistics**:
+- Files changed: 3 (backend/requirements.txt, VERSION, CHANGELOG.md)
+- Backend dependency updates: 1 package
+- Breaking changes: None
+
+**Version Management**:
+- This is a **beta release** for testing and validation
+- Version naming: 1.2.3-beta (incremental beta versioning)
+- Previous beta: 1.2.2-beta (2025-10-27)
+- Latest stable: 1.2.0 (2025-10-13)
+- Stable release will be 1.2.3 after validation
+
+
 All notable changes to the AI Stock Trading System will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
