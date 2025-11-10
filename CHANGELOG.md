@@ -1,5 +1,57 @@
 # Changelog
 
+## [1.2.4-beta] - 2025-11-10
+
+### Changed
+- **Backend Dependencies**: Conservative minor and patch updates for bug fixes, stability, and security
+  - Updated `fastapi` from 0.120.4 to 0.121.1 (new dependency scopes feature, bug fixes)
+  - Updated `pydantic` from 2.12.3 to 2.12.4 (regression fixes, stability improvements)
+  - Updated `httpx` from 0.27.2 to 0.28.1 (HTTP/2 improvements, bug fixes)
+  - Updated `aiofiles` from 24.1.0 to 25.1.0 (async file I/O improvements)
+  - Updated `aiosqlite` from 0.20.0 to 0.21.0 (async SQLite improvements)
+  - Updated `python-dotenv` from 1.0.1 to 1.2.1 (environment variable handling improvements)
+  - Updated `pytz` from 2024.2 to 2025.2 (latest timezone data)
+  - Updated `tenacity` from 9.0.0 to 9.1.2 (retry logic improvements)
+  - Updated `tiktoken` from 0.8.0 to 0.12.0 (token calculation accuracy improvements)
+
+### Fixed
+- Inherited bug fixes from FastAPI `0.120.5` to `0.121.1`:
+  - Fixed `Depends(func, scope='function')` for top level (parameterless) dependencies
+  - Fixed security schemes in OpenAPI when added at the top level app
+  - Reduced internal cyclic recursion in dependencies
+- Inherited bug fixes from Pydantic `2.12.4`:
+  - Fixed forward references in parent `TypedDict` classes (Python 3.14+)
+  - Fixed IP address type serialization with `serialize_as_any`
+  - Fixed `collections.defaultdict` default value handling
+  - Fixed field serializers on nested typed dictionaries
+
+### Technical Details
+
+**Commit Information**:
+- Maintenance Type: Regular inspection and conservative updates
+- Update Strategy: Bug-fix and stability-oriented, backward-compatible changes only
+- Testing: Dependency compatibility verified, syntax checks passed
+
+**File Statistics**:
+- Files changed: 4 (backend/requirements.txt, VERSION, CHANGELOG.md, VERSION_HISTORY.md)
+- Backend dependency updates: 9 packages
+- Breaking changes: None
+
+**Version Management**:
+- This is a **beta release** for testing and validation
+- Version naming: 1.2.4-beta (incremental beta versioning)
+- Previous beta: 1.2.3-beta (2025-11-03)
+- Latest stable: 1.2.0 (2025-10-13)
+- Stable release will be 1.2.4 after validation
+
+**Deferred Updates**:
+- OpenAI SDK v2.x migration (major version update with breaking changes)
+  - Current: 1.54.4 (stable and secure)
+  - Latest: 2.7.1 (requires migration effort)
+  - Plan: Separate update cycle with dedicated testing
+- NumPy 2.x upgrade (major version update, pandas compatibility verification needed)
+- Pytest 9.x upgrade (major version update, test suite verification needed)
+
 ## [1.2.3-beta] - 2025-11-03
 
 ### Changed
