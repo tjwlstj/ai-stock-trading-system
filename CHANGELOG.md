@@ -1,4 +1,39 @@
-# Changelog
+# CHANGELOG
+
+## [1.2.5-beta] - 2025-11-17
+
+### Changed
+- **Backend Dependencies**: Conservative patch update for bug fixes and stability
+  - Updated `fastapi` from 0.121.1 to 0.121.2 (bug fixes, stability improvements)
+
+### Fixed
+- Inherited bug fixes from FastAPI 0.121.2 (released 2025-11-13)
+
+### Technical Details
+
+**Commit Information**:
+- Maintenance Type: Regular inspection and conservative patch update
+- Update Strategy: Bug-fix oriented, backward-compatible changes only
+- Testing: Dependency compatibility verified
+
+**File Statistics**:
+- Files changed: 4 (backend/requirements.txt, VERSION, CHANGELOG.md, VERSION_HISTORY.md)
+- Backend dependency updates: 1 package (FastAPI)
+- Breaking changes: None
+
+**Version Management**:
+- This is a **beta release** for testing and validation
+- Version naming: 1.2.5-beta (incremental beta versioning)
+- Previous beta: 1.2.4-beta (2025-11-10)
+- Latest stable: 1.2.0 (2025-10-13)
+- Stable release will be 1.2.5 after validation
+
+**Deferred Updates**:
+- OpenAI SDK v2.x migration (major version update with breaking changes)
+  - Current: 1.54.4 (stable and secure)
+  - Latest: 2.8.0 (requires migration effort and testing)
+
+---
 
 ## [1.2.4-beta] - 2025-11-10
 
