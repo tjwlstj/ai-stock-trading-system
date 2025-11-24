@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## [1.2.6-beta] - 2025-11-24
+
+### Changed
+- **Backend Dependencies**: Conservative patch update for bug fixes and stability
+  - Updated `fastapi` from 0.121.2 to 0.121.3 (internal refactoring, dependency bump)
+
+### Fixed
+- Inherited bug fixes from FastAPI 0.121.3 (released 2025-11-19)
+
+### Technical Details
+
+**Commit Information**:
+- Maintenance Type: Regular inspection and conservative patch update
+- Update Strategy: Bug-fix oriented, backward-compatible changes only
+- Testing: Dependency compatibility verified
+
+**File Statistics**:
+- Files changed: 4 (backend/requirements.txt, VERSION, CHANGELOG.md, VERSION_HISTORY.md)
+- Backend dependency updates: 1 package (FastAPI)
+- Breaking changes: None
+
+**Version Management**:
+- This is a **beta release** for testing and validation
+- Version naming: 1.2.6-beta (incremental beta versioning)
+- Previous beta: 1.2.5-beta (2025-11-17)
+- Latest stable: 1.2.0 (2025-10-13)
+- Stable release will be 1.2.6 after validation
+
+**Deferred Updates**:
+- OpenAI SDK v2.x migration (major version update with breaking changes)
+  - Current: 1.54.4 (stable and secure)
+  - Latest: 2.8.1 (requires migration effort and testing)
+
+---
+
 ## [1.2.5-beta] - 2025-11-17
 
 ### Changed
@@ -51,7 +86,7 @@
 
 ### Fixed
 - Inherited bug fixes from FastAPI `0.120.5` to `0.121.1`:
-  - Fixed `Depends(func, scope='function')` for top level (parameterless) dependencies
+  - Fixed `Depends(func, scope=\'function\')` for top level (parameterless) dependencies
   - Fixed security schemes in OpenAPI when added at the top level app
   - Reduced internal cyclic recursion in dependencies
 - Inherited bug fixes from Pydantic `2.12.4`:
@@ -240,7 +275,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed Independence Day and other holiday skip logic
   - Prevented incorrect date calculations using `timedelta(days=1)`
 - Added proper bytes decoding for Redis cached data
-- Improved timestamp parsing with ISO format fallback handling (handles both standard and 'Z' suffix)
+- Improved timestamp parsing with ISO format fallback handling (handles both standard and \'Z\' suffix)
 - Fixed potential data type issues in Redis responses (bytes vs string)
 
 ### Performance
@@ -342,5 +377,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Yahoo Finance data collection
 - OpenAI API integration
 - Basic portfolio management features
-
-
