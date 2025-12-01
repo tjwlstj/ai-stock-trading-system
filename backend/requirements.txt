@@ -1,7 +1,7 @@
 # Core framework (pinned versions for reproducibility)
-fastapi==0.121.3
+fastapi==0.123.0
 uvicorn[standard]==0.38.0
-pydantic==2.12.4
+pydantic==2.12.5
 
 # Environment and configuration
 python-dotenv==1.2.1
