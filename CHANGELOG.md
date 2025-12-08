@@ -1,5 +1,53 @@
 # CHANGELOG
 
+## [1.2.8-beta] - 2025-12-08
+
+### Changed
+- **Backend Dependencies**: Conservative minor version update
+  - Updated `fastapi` from 0.123.0 to 0.124.0 (traceback improvements with endpoint metadata)
+
+### Security
+- **Frontend Dependencies**: High-priority security vulnerability fix
+  - Fixed `@modelcontextprotocol/sdk` vulnerability (GHSA-w48q-cv73-mx4w) - DNS rebinding protection issue
+  - Applied automatic security patch via `pnpm audit --fix`
+  - All known vulnerabilities resolved
+
+### Fixed
+- Inherited improvements from FastAPI 0.124.0 (released 2025-12-06)
+  - Enhanced tracebacks by adding endpoint metadata for better debugging
+  - Improved error context visibility during development
+
+### Technical Details
+
+**Commit Information**:
+- Maintenance Type: Regular inspection and conservative updates
+- Update Strategy: Security-first, debugging improvements, backward-compatible changes only
+- Testing: Dependency compatibility verified, security audit passed
+
+**File Statistics**:
+- Files changed: 5 (backend/requirements.txt, frontend/package.json, VERSION, CHANGELOG.md, VERSION_HISTORY.md)
+- Backend dependency updates: 1 package (FastAPI)
+- Frontend security fixes: 1 high-severity vulnerability resolved (@modelcontextprotocol/sdk)
+- Breaking changes: None
+
+**Version Management**:
+- This is a **beta release** for testing and validation
+- Version naming: 1.2.8-beta (incremental beta versioning)
+- Previous beta: 1.2.7-beta (2025-12-01)
+- Latest stable: 1.2.0 (2025-10-13)
+- Stable release will be 1.2.8 after validation
+
+**Deferred Updates**:
+- OpenAI SDK v2.x migration (major version update with breaking changes)
+  - Current: 1.54.4 (stable and secure)
+  - Latest: 2.x.x (requires migration effort and testing)
+  - Plan: Separate update cycle with dedicated testing in v1.3.0
+
+**Reference Documents**:
+- [Inspection Report](./inspection_findings_2025-12-08.md)
+
+---
+
 ## [1.2.7-beta] - 2025-12-01
 
 ### Changed
