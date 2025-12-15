@@ -29,14 +29,59 @@
 - **주요 변경사항**: 14개 패키지 업데이트, 4+ 보안 취약점 해결, 베타 버전 안정화
 
 ### 베타 버전 (Beta)
-- **버전**: v1.2.8-beta
-- **출시일**: 2025-12-08
-- **주요 변경사항**: FastAPI 0.124.0 업데이트, 프론트엔드 고위험 보안 패치
-- **상태**: v1.3.0으로 승격됨
+- **버전**: v1.3.1-beta
+- **출시일**: 2025-12-15
+- **주요 변경사항**: FastAPI 0.124.4, SQLAlchemy 2.0.45 패치 업데이트
+- **상태**: 테스트 중
 
 ---
 
 ## 베타 버전 히스토리
+
+### v1.3.1-beta (2025-12-15)
+**유형**: 정기 점검 및 보수적 패치 업데이트
+
+**변경사항**:
+- FastAPI 0.124.0 → 0.124.4 업데이트
+  - Parameter aliases 버그 수정 (0.124.4)
+  - Tagged union with discriminator 지원 개선 (0.124.3)
+  - TYPE_CHECKING 지원 수정 (0.124.2)
+  - Arbitrary types 처리 개선 (0.124.1)
+  - 2025-12-12 최종 릴리스
+- SQLAlchemy 2.0.44 → 2.0.45 업데이트
+  - 2.1 시리즈 개선사항 백포트
+  - Python 3.14 호환성 지속 개선
+  - 안정성 및 성능 향상
+  - 2025-12-09 릴리스
+
+**패키지 현황**:
+- 전체 패키지: 15개
+- 업데이트된 패키지: 2개 (FastAPI, SQLAlchemy)
+- 최신 버전 유지: 13개
+- 보안 취약점: 0개 (프론트엔드 감사 깨끗함)
+
+**파일 변경**:
+- `backend/requirements.txt`: fastapi==0.124.4, sqlalchemy==2.0.45
+- `VERSION`: 1.3.1-beta
+- `CHANGELOG.md`: v1.3.1-beta 항목 추가
+- `VERSION_HISTORY.md`: 베타 버전 히스토리 업데이트
+
+**테스트 결과**:
+- ✅ FastAPI 0.124.4 import 및 기능 테스트 통과
+- ✅ SQLAlchemy 2.0.45 import 및 기능 테스트 통과
+- ✅ Pydantic 2.12.5 호환성 확인
+- ✅ FastAPI + SQLAlchemy + Pydantic 통합 테스트 통과
+
+**Git 정보**:
+- Commit: (예정)
+- Tag: `v1.3.1-beta`
+
+**참고 문서**:
+- [완전한 패키지 분석](./complete_package_analysis.md)
+- [패키지 업데이트 요약](./package_updates.md)
+- [FastAPI 릴리스 정보](./fastapi_releases.md)
+
+---
 
 ### v1.2.8-beta (2025-12-08)
 **유형**: 정기 점검 및 보수적 업데이트 + 보안 패치

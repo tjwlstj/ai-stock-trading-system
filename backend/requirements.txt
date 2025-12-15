@@ -1,5 +1,5 @@
 # Core framework (pinned versions for reproducibility)
-fastapi==0.124.0
+fastapi==0.124.4
 uvicorn[standard]==0.38.0
 pydantic==2.12.5
 
@@ -14,7 +14,7 @@ aiofiles==25.1.0
 tenacity==9.1.2
 
 # Database
-sqlalchemy==2.0.44
+sqlalchemy==2.0.45
 aiosqlite==0.21.0
 
 # AI and ML
