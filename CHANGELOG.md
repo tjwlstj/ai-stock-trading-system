@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.3.2-beta] - 2026-01-12
+
+### Changed
+- **Backend Dependencies**: Conservative minor version update.
+  - Updated `aiosqlite` from 0.21.0 to 0.22.1 for bug fixes and improvements.
+
+### Security
+- **Frontend Dependencies**: Resolved 7 security vulnerabilities.
+  - Fixed `qs` (< 6.14.1)
+  - Fixed `@modelcontextprotocol/sdk` (< 1.25.2)
+  - Fixed `react-router` (multiple version ranges)
+  - All known frontend vulnerabilities resolved via `pnpm audit --fix`.
+
+### Technical Details
+
+**Release Information**:
+- Release Type: Beta release (routine maintenance)
+- Update Strategy: Conservative minor updates and security fixes.
+- Testing: All compatibility tests passed.
+- Breaking Changes: None.
+
+**Package Status**:
+- Total packages in requirements.txt: 15
+- Packages updated: 1 (aiosqlite)
+- Frontend security vulnerabilities: 0 (all resolved)
+
+**File Changes**:
+- `backend/requirements.txt`: Updated aiosqlite version.
+- `frontend/package.json`: Added security overrides.
+- `VERSION`: Updated to 1.3.2-beta.
+- `CHANGELOG.md`: Added v1.3.2-beta entry.
+- `VERSION_HISTORY.md`: To be updated.
+
+**Reference Documents**:
+- [Package Check Report](./package_check_2026-01-12.md)
+- [FastAPI Release Analysis](./fastapi_releases_2026-01-12.md)
+
+---
+
 ## [1.3.1-beta] - 2025-12-15
 
 ### Changed
@@ -94,7 +133,7 @@
 
 ### Fixed
 - Inherited bug fixes from FastAPI 0.115.0 → 0.124.0
-  - Fixed `Depends(func, scope='function')` for top-level dependencies
+  - Fixed `Depends(func, scope=\'function\')` for top-level dependencies
   - Fixed security schemes in OpenAPI when added at the top-level app
   - Reduced internal cyclic recursion in dependencies
   - Improved dependency caching for dependencies without scopes
