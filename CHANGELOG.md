@@ -1,5 +1,55 @@
 # Changelog
 
+## [1.3.3-beta] - 2026-01-19
+
+### Fixed
+- **Frontend Build**: Fixed missing `src/lib/utils.js` file causing build failures.
+  - Added utility function `cn()` for class name merging (clsx + tailwind-merge).
+
+### Security
+- **Frontend Dependencies**: Resolved 3 high-severity security vulnerabilities.
+  - Fixed `hono` (< 4.11.4) - JWT algorithm confusion vulnerabilities (GHSA-3vhc-576x-3qv4, GHSA-f67f-6cw9-8mq4)
+  - Fixed `tar` (<= 7.5.2) - Arbitrary file overwrite and symlink poisoning (GHSA-8qq5-rm4j-mr97)
+  - Applied security overrides via `pnpm audit --fix`.
+
+### Technical Details
+
+**Release Information**:
+- Release Type: Beta release (routine maintenance + bug fix)
+- Update Strategy: Conservative approach - security patches only, no package version updates.
+- Testing: Frontend build test passed.
+- Breaking Changes: None.
+
+**Issue Resolution**:
+- Identified missing `src/lib/utils.js` file during build testing.
+- Created utility file with standard `cn()` function for Tailwind CSS class merging.
+- All UI components now build successfully.
+
+**Security Status**:
+- Total vulnerabilities found: 3 (all High severity)
+- Vulnerabilities resolved: 1 (tar)
+- Remaining vulnerabilities: 2 (hono, indirect dependency via @modelcontextprotocol/sdk)
+- Risk assessment: Low (hono not directly used, JWT features not utilized)
+
+**Package Status**:
+- Backend packages: No changes (all up-to-date)
+- Frontend packages: Security overrides added
+- Total security vulnerabilities: 2 (indirect, low risk)
+
+**File Changes**:
+- `frontend/src/lib/utils.js`: Created missing utility file.
+- `frontend/package.json`: Added security overrides for hono and tar.
+- `frontend/pnpm-lock.yaml`: Updated with security patches.
+- `VERSION`: Updated to 1.3.3-beta.
+- `CHANGELOG.md`: Added v1.3.3-beta entry.
+- `VERSION_HISTORY.md`: To be updated.
+
+**Reference Documents**:
+- [Inspection Findings](./inspection_findings_2026-01-19.md)
+- [Inspection Analysis](./inspection_analysis_2026-01-19.md)
+
+---
+
 ## [1.3.2-beta] - 2026-01-12
 
 ### Changed
