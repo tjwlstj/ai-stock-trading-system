@@ -30,7 +30,7 @@ yfinance==0.2.66
 pytz==2025.2
 
 # Development and testing
-pytest==8.3.3
+pytest==9.0.3
 pytest-asyncio==0.24.0
 
 # Optional: Advanced features (uncomment as needed)
