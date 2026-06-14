@@ -1,4 +1,7 @@
 # Python
+.venv/
+venv/
+env/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -10,8 +13,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
 parts/
 sdist/
 var/
@@ -78,3 +79,6 @@ backups/
 *api_key*
 *secret*
 config.json
+# ...but keep these source files that legitimately contain "secret" in the name
+!backend/app/secrets_store.py
+!**/secrets_store.py

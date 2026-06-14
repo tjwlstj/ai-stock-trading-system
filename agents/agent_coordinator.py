@@ -12,7 +12,7 @@ from agents.pessimistic_agent import PessimisticAnalyst
 from agents.risk_manager import RiskManager
 from backend.database import DatabaseManager
 from backend.data_collector import StockDataCollector
-from backend.cloud_storage_fixed import CloudStorageManager
+from backend.cloud_storage import CloudStorageManager
 from typing import Dict, List, Optional, Any, Tuple
 import logging
 from datetime import datetime
