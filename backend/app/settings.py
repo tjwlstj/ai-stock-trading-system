@@ -4,7 +4,7 @@ Centralized configuration management with environment variable support
 """
 
 import os
-from typing import List
+from typing import List, ClassVar
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -33,6 +33,24 @@ class Settings(BaseModel):
     # Stock Data API
     STOCK_API_KEY: str = os.getenv("STOCK_API_KEY", "")
     YAHOO_FINANCE_TIMEOUT: int = int(os.getenv("YAHOO_FINANCE_TIMEOUT", "10"))
+
+    # Market / Broker (국내 KRX) — see docs/ARCHITECTURE_KRX.md
+    MARKET: str = os.getenv("MARKET", "KRX")
+    BASE_CURRENCY: str = os.getenv("BASE_CURRENCY", "KRW")
+    BROKER: str = os.getenv("BROKER", "paper")  # paper | kis | toss
+    ALLOW_LIVE_TRADING: bool = os.getenv("ALLOW_LIVE_TRADING", "false").lower() == "true"
+
+    # Toss Securities Open API
+    TOSS_CLIENT_ID: str = os.getenv("TOSS_CLIENT_ID", "")
+    TOSS_CLIENT_SECRET: str = os.getenv("TOSS_CLIENT_SECRET", "")
+    TOSS_ACCOUNT_NO: str = os.getenv("TOSS_ACCOUNT_NO", "")
+    TOSS_BASE_URL: str = os.getenv("TOSS_BASE_URL", "https://openapi.tossinvest.com")
+
+    # Korea Investment & Securities (KIS) — 모의투자 권장
+    KIS_APP_KEY: str = os.getenv("KIS_APP_KEY", "")
+    KIS_APP_SECRET: str = os.getenv("KIS_APP_SECRET", "")
+    KIS_ACCOUNT_NO: str = os.getenv("KIS_ACCOUNT_NO", "")
+    KIS_PAPER: bool = os.getenv("KIS_PAPER", "true").lower() == "true"
     
     # CORS Configuration
     CORS_ALLOW_ORIGINS: str = os.getenv(
@@ -67,6 +85,30 @@ class Settings(BaseModel):
             return self.DB_URL.replace("sqlite://", "sqlite+aiosqlite://", 1)
         return self.DB_URL
     
+    # Fields that can change at runtime via the Settings UI / secrets store
+    _RUNTIME_FIELDS: ClassVar[tuple] = (
+        "OPENAI_API_KEY", "OPENAI_MODEL", "STOCK_API_KEY",
+        "MARKET", "BASE_CURRENCY", "BROKER", "ALLOW_LIVE_TRADING",
+        "TOSS_CLIENT_ID", "TOSS_CLIENT_SECRET", "TOSS_ACCOUNT_NO", "TOSS_BASE_URL",
+        "KIS_APP_KEY", "KIS_APP_SECRET", "KIS_ACCOUNT_NO", "KIS_PAPER",
+    )
+
+    def refresh(self) -> None:
+        """Re-read runtime-changeable settings from the current environment.
+
+        Called after secrets are applied/saved so the running process picks up
+        new keys without a restart.
+        """
+        for field in self._RUNTIME_FIELDS:
+            raw = os.getenv(field)
+            if raw is None:
+                continue
+            current = getattr(self, field)
+            if isinstance(current, bool):
+                setattr(self, field, raw.lower() == "true")
+            else:
+                setattr(self, field, raw)
+
     def validate_required_settings(self) -> List[str]:
         """Validate required settings and return missing ones"""
         missing = []

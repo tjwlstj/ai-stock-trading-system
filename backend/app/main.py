@@ -37,9 +37,14 @@ async def lifespan(app: FastAPI):
     # Initialize required directories
     from .utils.directories import initialize_app_directories
     initialize_app_directories()
-    
+
+    # Apply user-entered secrets (Settings UI) before building clients
+    from . import secrets_store
+    secrets_store.apply_to_env()
+    settings.refresh()
+
     await init_db()
-    
+
     if settings.OPENAI_API_KEY:
         openai_client = OpenAIClient(settings.OPENAI_API_KEY)
         logger.info("OpenAI client initialized")
@@ -131,11 +136,12 @@ async def health_check():
         )
 
 # Include API routers
-from .routers import stocks, portfolio
+from .routers import stocks, portfolio, settings as settings_router
 
 # Include routers
 app.include_router(stocks.router)
 app.include_router(portfolio.router)
+app.include_router(settings_router.router)
 
 @app.get("/api/config")
 async def get_client_config():
