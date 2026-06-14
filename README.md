@@ -11,6 +11,13 @@
 
 A sophisticated AI-powered stock analysis system that combines multiple data sources with advanced language models to provide comprehensive market insights and research capabilities.
 
+> ### 🇰🇷 프로젝트 방향 (2026~)
+> 본 프로젝트는 **국내(KRX) 시장 기준의, 실거래까지 연결 가능한 AI 보조 트레이딩 시스템**으로 재설계 중입니다.
+> 브로커는 어댑터로 추상화하며(개발=PaperBroker/KIS 모의투자, 실거래 타깃=토스증권 Open API), **LLM은 신호만 생성하고 주문은 RiskGuard·수동 확인 게이트를 반드시 통과**합니다.
+> 전체 설계·증권사 API 비교·로드맵은 **[국내(KRX) 아키텍처 설계 문서](docs/ARCHITECTURE_KRX.md)** 를 참고하세요.
+>
+> **현재 상태(정직 고지)**: 아직 주문 실행 기능은 없습니다(분석 전용). 위 설계는 단계적으로 구현됩니다. README의 일부 기능 설명은 목표치이며 실제 구현과 다를 수 있습니다.
+
 ## ✨ Features
 
 ### 🧠 **Multi-Agent AI Analysis**
@@ -184,12 +191,11 @@ docker-compose up -d
 ## 📖 Documentation
 
 ### Core Guides
-- 📋 **[API Documentation](API_DOCUMENTATION.md)** - Complete API reference with examples
-- 🗄️ **[Database Guide](DATABASE_GUIDE.md)** - SQLite optimization & PostgreSQL migration
-- 🧪 **[Testing Guide](TESTING_GUIDE.md)** - Comprehensive testing strategies
-- 🔒 **[Security Guide](SECURITY_GUIDE.md)** - Security best practices & compliance
-- 🎨 **[Frontend Guide](FRONTEND_GUIDE.md)** - UI/UX patterns & React best practices
-- 📊 **[Monitoring Guide](MONITORING_GUIDE.md)** - Performance monitoring and alerting
+- 📋 **[API Documentation](docs/API_DOCUMENTATION.md)** - Complete API reference with examples
+- 🗄️ **[Database Guide](docs/DATABASE_GUIDE.md)** - SQLite optimization & PostgreSQL migration
+- 🧪 **[Testing Guide](docs/TESTING_GUIDE.md)** - Comprehensive testing strategies
+- 🔒 **[Security Guide](docs/SECURITY_GUIDE.md)** - Security best practices & compliance
+- 🎨 **[Frontend Guide](docs/FRONTEND_GUIDE.md)** - UI/UX patterns & React best practices
 
 ### Quick References
 - 🔧 **Configuration**: Environment variables and settings
@@ -569,11 +575,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-- 📖 **Documentation**: Check the guides in the `/docs` directory
+- 📖 **Documentation**: Check the guides in the [`docs/`](docs/) directory
 - 🐛 **Issues**: Report bugs on GitHub Issues
 - 💬 **Discussions**: Join GitHub Discussions for questions
-- 📧 **Contact**: For enterprise support, contact the maintainers
-- 🔧 **Troubleshooting**: See [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
 ## 🙏 Acknowledgments
 
