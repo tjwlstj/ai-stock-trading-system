@@ -1,0 +1,43 @@
+# 무료/유료 티어 정책 (tier capability context)
+#
+# 시스템이 "무엇을 허용할지"를 한 곳에서 선언하는 컨텍스트 구조입니다.
+# 코드는 이 파일을 읽어 기능을 게이팅합니다 (backend/app/tiers.py).
+#
+# 핵심 규칙:
+#   - 무료(free): 분석·조언까지만. 주문/구매/실거래는 보수적으로 차단.
+#   - 유료(paid): 분석·조언 + 안전장치(RiskGuard·수동확인·한도) 하에서 모의/실거래.
+
+default_tier: free
+
+tiers:
+  free:
+    label: "무료 (Free)"
+    description: "분석과 조언만 제공합니다. 실제 주문·구매·실거래는 비활성화됩니다."
+    capabilities:
+      analyze: true            # 시세/지표 분석
+      advise: true             # 매수/매도 "조언" 생성 (실행 아님)
+      place_orders: false      # 주문 실행 불가
+      live_trading: false      # 실거래 불가
+      brokers: ["paper"]       # 시뮬레이션 브로커만 선택 가능
+      max_order_amount_krw: 0
+    # 무료 티어에서 우선 사용할 AI 제공자 (무료 모델)
+    ai_providers: ["gemini_free"]
+    notes:
+      - "무료 모델은 입력/출력이 학습에 사용될 수 있어 계좌번호·키 등 민감정보 전송 금지"
+      - "주문/구매 UI는 비활성화하고 업그레이드 안내만 표시"
+      - "무료 모델 할당량은 예고 없이 변동 — 안정 운영용 아님"
+
+  paid:
+    label: "유료 (Paid)"
+    description: "분석·조언에 더해 안전장치 하에서 모의/실거래가 가능합니다."
+    capabilities:
+      analyze: true
+      advise: true
+      place_orders: true       # 단, RiskGuard + 수동확인 필수
+      live_trading: true       # 단, ALLOW_LIVE_TRADING=true + 브로커=toss + 한도 충족 시에만
+      brokers: ["paper", "kis", "toss"]
+      max_order_amount_krw: 100000
+    ai_providers: ["openai", "gemini_free"]
+    notes:
+      - "실거래는 ALLOW_LIVE_TRADING=true + BROKER=toss + 수동확인이 동시에 충족될 때만 실행"
+      - "유료 모델(OpenAI)은 분석 품질이 높지만 사용량 과금됨"

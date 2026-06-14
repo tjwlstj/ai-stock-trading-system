@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 # Keys whose VALUES are sensitive — masked in any read response.
 SECRET_KEYS: List[str] = [
     "OPENAI_API_KEY",
+    "GEMINI_API_KEY",
     "STOCK_API_KEY",
     "TOSS_CLIENT_ID",
     "TOSS_CLIENT_SECRET",
@@ -37,7 +38,9 @@ SECRET_KEYS: List[str] = [
 
 # Non-sensitive config that the UI may also set — returned in clear text.
 CONFIG_KEYS: List[str] = [
+    "APP_TIER",
     "OPENAI_MODEL",
+    "GEMINI_MODEL",
     "BROKER",
     "MARKET",
     "ALLOW_LIVE_TRADING",

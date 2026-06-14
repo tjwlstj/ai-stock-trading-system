@@ -10,22 +10,53 @@ export const RUN_MODES = [
 
 export const PROVIDERS = [
   {
+    id: 'gemini_free',
+    tier: 'free',
+    name: 'Google Gemini (무료)',
+    company: 'Google',
+    category: 'AI 분석 (무료 모델)',
+    badge: '무료',
+    badgeTone: 'success',
+    summary: 'Google AI Studio에서 신용카드 없이 발급하는 무료 키. 무료 티어의 기본 분석 모델입니다.',
+    fields: [
+      {
+        key: 'GEMINI_API_KEY',
+        label: 'API Key',
+        type: 'password',
+        placeholder: 'AIza...',
+        required: true,
+        tooltip:
+          'aistudio.google.com/app/apikey 에서 Google 계정으로 발급한 무료 키. 무료 티어는 입력/출력이 학습에 쓰일 수 있어 계좌·키 등 민감정보는 보내지 마세요.',
+      },
+    ],
+    howTo: [
+      'aistudio.google.com/app/apikey 접속 → Google 계정 로그인',
+      '"Create API key" 클릭 → 키 복사 (신용카드 불필요)',
+      '아래에 붙여넣고 저장 → "테스트"로 연결 확인',
+      '주의: 무료 할당량은 예고 없이 변동 — 체험/임시용',
+    ],
+    issueUrl: 'https://aistudio.google.com/app/apikey',
+    docUrl: 'https://ai.google.dev/gemini-api/docs',
+    testable: true,
+  },
+  {
     id: 'openai',
+    tier: 'paid',
     name: 'OpenAI',
     company: 'OpenAI',
-    category: 'AI 분석 (LLM)',
-    badge: '필수',
+    category: 'AI 분석 (유료 모델)',
+    badge: '유료',
     badgeTone: 'default',
-    summary: 'AI 에이전트 분석에 사용하는 언어모델. 분석 기능을 쓰려면 필요합니다.',
+    summary: '사용량 과금되는 고품질 분석 모델. 유료 티어에서 권장합니다.',
     fields: [
       {
         key: 'OPENAI_API_KEY',
         label: 'API Key',
         type: 'password',
         placeholder: 'sk-...',
-        required: true,
+        required: false,
         tooltip:
-          'platform.openai.com에서 발급한 비밀 키. "sk-"로 시작합니다. 한 번만 표시되니 복사해 두세요. 절대 공유/커밋 금지.',
+          'platform.openai.com에서 발급한 비밀 키. "sk-"로 시작합니다. 한 번만 표시되니 복사해 두세요. 절대 공유/커밋 금지. (사용량 과금)',
       },
     ],
     howTo: [
@@ -40,6 +71,7 @@ export const PROVIDERS = [
   },
   {
     id: 'kis',
+    tier: 'paid',
     name: '한국투자증권 KIS Developers',
     company: '한국투자증권',
     category: '국내·해외 주식 시세/주문 · 모의투자',
@@ -67,6 +99,7 @@ export const PROVIDERS = [
   },
   {
     id: 'toss',
+    tier: 'paid',
     name: '토스증권 Open API',
     company: '토스증권',
     category: '국내·미국 주식 시세/주문 (실거래)',

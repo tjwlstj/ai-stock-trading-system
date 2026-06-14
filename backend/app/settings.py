@@ -25,10 +25,17 @@ class Settings(BaseModel):
     DATABASE_PATH: str = os.getenv("DATABASE_PATH", "data/stock_data.db")
     DB_URL: str = os.getenv("DB_URL", f"sqlite:///{DATABASE_PATH}")
     
-    # OpenAI Configuration
+    # Service tier: free (analysis/advice only) | paid (trading enabled)
+    APP_TIER: str = os.getenv("APP_TIER", "free")
+
+    # OpenAI Configuration (유료 모델)
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
     OPENAI_TIMEOUT: int = int(os.getenv("OPENAI_TIMEOUT", "30"))
+
+    # Google Gemini (무료 모델 — Google AI Studio 무료 키)
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     
     # Stock Data API
     STOCK_API_KEY: str = os.getenv("STOCK_API_KEY", "")
@@ -87,7 +94,9 @@ class Settings(BaseModel):
     
     # Fields that can change at runtime via the Settings UI / secrets store
     _RUNTIME_FIELDS: ClassVar[tuple] = (
+        "APP_TIER",
         "OPENAI_API_KEY", "OPENAI_MODEL", "STOCK_API_KEY",
+        "GEMINI_API_KEY", "GEMINI_MODEL",
         "MARKET", "BASE_CURRENCY", "BROKER", "ALLOW_LIVE_TRADING",
         "TOSS_CLIENT_ID", "TOSS_CLIENT_SECRET", "TOSS_ACCOUNT_NO", "TOSS_BASE_URL",
         "KIS_APP_KEY", "KIS_APP_SECRET", "KIS_ACCOUNT_NO", "KIS_PAPER",
@@ -112,10 +121,12 @@ class Settings(BaseModel):
     def validate_required_settings(self) -> List[str]:
         """Validate required settings and return missing ones"""
         missing = []
-        
-        if not self.OPENAI_API_KEY and self.APP_ENV != "testing":
-            missing.append("OPENAI_API_KEY")
-        
+
+        # At least one AI provider key is needed for analysis.
+        # Free tier can run on the Gemini free key alone; paid tier typically uses OpenAI.
+        if self.APP_ENV != "testing" and not (self.OPENAI_API_KEY or self.GEMINI_API_KEY):
+            missing.append("OPENAI_API_KEY 또는 GEMINI_API_KEY")
+
         return missing
 
 # Global settings instance

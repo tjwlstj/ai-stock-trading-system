@@ -10,8 +10,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
-  Key, Bot, Shield, Bell, Database, Cloud, Save,
-  CheckCircle, AlertTriangle, Info, ExternalLink, Loader2, RefreshCw,
+  Key, Bot, Shield, Bell, Database, Cloud, Save, Lock,
+  CheckCircle, XCircle, AlertTriangle, Info, ExternalLink, Loader2, RefreshCw,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { PROVIDERS, RUN_MODES, ALTERNATIVES, ADVANCED_LINKS } from '@/lib/providers'
@@ -31,17 +31,31 @@ const InfoTip = ({ text }) => (
 const badgeVariant = (tone) =>
   tone === 'warning' ? 'destructive' : tone === 'success' ? 'secondary' : 'default'
 
+// Capability ✓/✗ chip
+const Cap = ({ ok, label }) => (
+  <span className={`inline-flex items-center gap-1 text-xs ${ok ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+    {ok ? <CheckCircle className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />} {label}
+  </span>
+)
+
 const Settings = () => {
-  // ---- API keys / secrets (wired to backend) ----
+  // ---- API keys / secrets / tier (wired to backend) ----
   const [status, setStatus] = useState({ secrets: {}, config: {} })
+  const [tier, setTier] = useState({ current: 'free', label: '무료', description: '', capabilities: {}, notes: [], available: [] })
   const [drafts, setDrafts] = useState({})            // field key -> typed value
   const [providerState, setProviderState] = useState({}) // provider id -> {saving, testing, ok, msg}
+  const [notice, setNotice] = useState([])            // tier policy adjustment messages
   const [loadErr, setLoadErr] = useState(null)
+
+  const applyResponse = (res) => {
+    setStatus({ secrets: res.secrets || {}, config: res.config || {} })
+    if (res.tier) setTier(res.tier)
+    if (res.adjustments?.length) setNotice(res.adjustments)
+  }
 
   const loadStatus = async () => {
     try {
-      const s = await api.getSecrets()
-      setStatus({ secrets: s.secrets || {}, config: s.config || {} })
+      applyResponse(await api.getSecrets())
       setLoadErr(null)
     } catch (e) {
       setLoadErr(e.message)
@@ -66,7 +80,7 @@ const Settings = () => {
     patchProvider(provider.id, { saving: true, msg: null })
     try {
       const res = await api.saveSecrets(updates)
-      setStatus({ secrets: res.secrets, config: res.config })
+      applyResponse(res)
       setDrafts((d) => {
         const nd = { ...d }
         Object.keys(updates).forEach((k) => delete nd[k])
@@ -90,15 +104,104 @@ const Settings = () => {
 
   const saveConfig = async (updates) => {
     try {
-      const res = await api.saveSecrets(updates)
-      setStatus({ secrets: res.secrets, config: res.config })
+      applyResponse(await api.saveSecrets(updates))
     } catch (e) {
       setLoadErr(e.message)
     }
   }
 
+  const caps = tier.capabilities || {}
+  const allowedBrokers = caps.brokers || ['paper', 'kis', 'toss']
+  const canLive = !!caps.live_trading
   const broker = status.config.BROKER || 'paper'
   const liveOn = String(status.config.ALLOW_LIVE_TRADING).toLowerCase() === 'true'
+  const runModes = RUN_MODES.filter((m) => allowedBrokers.includes(m.value))
+
+  const freeProviders = PROVIDERS.filter((p) => p.tier === 'free')
+  const paidProviders = PROVIDERS.filter((p) => p.tier === 'paid')
+
+  const renderProvider = (p) => {
+    const st = providerState[p.id] || {}
+    return (
+      <Card key={p.id}>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="flex items-center gap-2"><Key className="h-5 w-5" /> {p.name}</CardTitle>
+            <Badge variant={badgeVariant(p.badgeTone)}>{p.badge}</Badge>
+          </div>
+          <CardDescription>{p.company} · {p.category}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">{p.summary}</p>
+          {p.warning && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{p.warning}</AlertDescription>
+            </Alert>
+          )}
+
+          {p.fields.map((f) => {
+            const cur = status.secrets[f.key]
+            return (
+              <div key={f.key} className="space-y-1.5">
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor={f.key}>
+                    {f.label}{f.required && <span className="text-destructive"> *</span>}
+                  </Label>
+                  <InfoTip text={f.tooltip} />
+                  {cur?.set && (
+                    <span className="ml-auto text-xs text-green-600 dark:text-green-400">설정됨 · {cur.preview}</span>
+                  )}
+                </div>
+                <Input
+                  id={f.key}
+                  type={f.type}
+                  autoComplete="off"
+                  placeholder={cur?.set ? '재입력 시에만 변경됩니다' : f.placeholder}
+                  value={drafts[f.key] ?? ''}
+                  onChange={(e) => setDraft(f.key, e.target.value)}
+                />
+              </div>
+            )
+          })}
+
+          <details className="text-sm">
+            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">발급 방법 보기</summary>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 text-muted-foreground">
+              {p.howTo.map((step, i) => <li key={i}>{step}</li>)}
+            </ol>
+          </details>
+
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <Button onClick={() => saveProvider(p)} disabled={st.saving}>
+              {st.saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              저장
+            </Button>
+            {p.testable && (
+              <Button variant="outline" onClick={() => testProvider(p)} disabled={st.testing}>
+                {st.testing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
+                테스트
+              </Button>
+            )}
+            <Button variant="ghost" asChild>
+              <a href={p.issueUrl} target="_blank" rel="noreferrer">
+                발급 페이지 <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+              </a>
+            </Button>
+            <a href={p.docUrl} target="_blank" rel="noreferrer" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
+              심화 가이드
+            </a>
+          </div>
+
+          {st.msg && (
+            <p className={`text-sm ${st.ok === false ? 'text-destructive' : st.ok === true ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+              {st.msg}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
 
   // ---- Other tabs (local-only preferences) ----
   const [settings, setSettings] = useState({
@@ -125,7 +228,7 @@ const Settings = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">설정 (Settings)</h1>
-          <p className="text-muted-foreground">API 키·토큰을 직접 입력하고 실행 모드를 설정하세요.</p>
+          <p className="text-muted-foreground">서비스 티어를 고르고 API 키·토큰을 직접 입력하세요.</p>
         </div>
         <Button variant="outline" onClick={loadStatus}>
           <RefreshCw className="h-4 w-4 mr-2" /> 상태 새로고침
@@ -149,6 +252,50 @@ const Settings = () => {
               <AlertDescription>백엔드 연결 실패: {loadErr} — 백엔드가 실행 중인지 확인하세요.</AlertDescription>
             </Alert>
           )}
+          {notice.length > 0 && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                <ul className="list-disc pl-4">{notice.map((n, i) => <li key={i}>{n}</li>)}</ul>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Service tier */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5" /> 서비스 티어</CardTitle>
+              <CardDescription>{tier.description || '무료는 분석·조언까지만, 유료는 안전장치 하에서 거래까지 가능합니다.'}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2 max-w-sm">
+                <div className="flex items-center gap-1.5">
+                  <Label>티어</Label>
+                  <InfoTip text="무료(free)=분석·조언 전용, 주문/실거래 차단. 유료(paid)=RiskGuard·수동확인 하에서 거래 가능." />
+                </div>
+                <Select value={tier.current} onValueChange={(v) => saveConfig({ APP_TIER: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {(tier.available || []).map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 rounded-lg border p-3">
+                <Cap ok={caps.analyze} label="분석" />
+                <Cap ok={caps.advise} label="조언" />
+                <Cap ok={caps.place_orders} label="주문 실행" />
+                <Cap ok={caps.live_trading} label="실거래" />
+              </div>
+              {tier.current === 'free' && (
+                <Alert>
+                  <Lock className="h-4 w-4" />
+                  <AlertDescription>
+                    무료 티어입니다 — <b>분석과 조언만</b> 제공하며 주문/구매/실거래는 비활성화됩니다. 거래 기능은 유료 티어에서 사용하세요.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Run mode */}
           <Card>
@@ -160,30 +307,31 @@ const Settings = () => {
               <div className="space-y-2 max-w-sm">
                 <div className="flex items-center gap-1.5">
                   <Label>브로커</Label>
-                  <InfoTip text="paper=로컬 시뮬, kis=한국투자 모의투자, toss=토스 실거래" />
+                  <InfoTip text="paper=로컬 시뮬, kis=한국투자 모의투자, toss=토스 실거래 (티어에 따라 선택 가능 범위가 달라집니다)" />
                 </div>
                 <Select value={broker} onValueChange={(v) => saveConfig({ BROKER: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {RUN_MODES.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                    {runModes.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-muted-foreground">
-                  {RUN_MODES.find((m) => m.value === broker)?.hint}
-                </p>
+                <p className="text-sm text-muted-foreground">{runModes.find((m) => m.value === broker)?.hint}</p>
               </div>
 
               <div className="flex items-center justify-between rounded-lg border p-3">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
                     <Label>실거래 허용</Label>
-                    <InfoTip text="이 스위치가 켜지고 브로커가 toss일 때에만 실제 주문이 실행됩니다." />
+                    <InfoTip text="유료 티어 + 브로커=toss + 이 스위치가 모두 켜져야 실제 주문이 실행됩니다." />
                   </div>
-                  <p className="text-sm text-muted-foreground">끄면 토스를 선택해도 실주문이 차단됩니다(안전장치).</p>
+                  <p className="text-sm text-muted-foreground">
+                    {canLive ? '끄면 토스를 선택해도 실주문이 차단됩니다(안전장치).' : '무료 티어에서는 실거래를 켤 수 없습니다.'}
+                  </p>
                 </div>
-                <Switch checked={liveOn} onCheckedChange={(c) => saveConfig({ ALLOW_LIVE_TRADING: c ? 'true' : 'false' })} />
+                <Switch checked={liveOn && canLive} disabled={!canLive}
+                  onCheckedChange={(c) => saveConfig({ ALLOW_LIVE_TRADING: c ? 'true' : 'false' })} />
               </div>
-              {liveOn && broker === 'toss' && (
+              {liveOn && canLive && broker === 'toss' && (
                 <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>실거래가 활성화되어 있습니다. 실제 자금으로 주문이 나갈 수 있습니다.</AlertDescription>
@@ -192,89 +340,24 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          {/* Provider cards */}
-          {PROVIDERS.map((p) => {
-            const st = providerState[p.id] || {}
-            return (
-              <Card key={p.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between gap-2">
-                    <CardTitle className="flex items-center gap-2"><Key className="h-5 w-5" /> {p.name}</CardTitle>
-                    <Badge variant={badgeVariant(p.badgeTone)}>{p.badge}</Badge>
-                  </div>
-                  <CardDescription>{p.company} · {p.category}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground">{p.summary}</p>
-                  {p.warning && (
-                    <Alert variant="destructive">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription>{p.warning}</AlertDescription>
-                    </Alert>
-                  )}
+          {/* Free providers */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+              <Badge variant="secondary">무료</Badge> 무료 모델 — 분석·조언용
+            </h3>
+            {freeProviders.map(renderProvider)}
+          </div>
 
-                  {p.fields.map((f) => {
-                    const cur = status.secrets[f.key]
-                    return (
-                      <div key={f.key} className="space-y-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <Label htmlFor={f.key}>
-                            {f.label}{f.required && <span className="text-destructive"> *</span>}
-                          </Label>
-                          <InfoTip text={f.tooltip} />
-                          {cur?.set && (
-                            <span className="ml-auto text-xs text-green-600 dark:text-green-400">설정됨 · {cur.preview}</span>
-                          )}
-                        </div>
-                        <Input
-                          id={f.key}
-                          type={f.type}
-                          autoComplete="off"
-                          placeholder={cur?.set ? '재입력 시에만 변경됩니다' : f.placeholder}
-                          value={drafts[f.key] ?? ''}
-                          onChange={(e) => setDraft(f.key, e.target.value)}
-                        />
-                      </div>
-                    )
-                  })}
-
-                  <details className="text-sm">
-                    <summary className="cursor-pointer text-muted-foreground hover:text-foreground">발급 방법 보기</summary>
-                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-muted-foreground">
-                      {p.howTo.map((step, i) => <li key={i}>{step}</li>)}
-                    </ol>
-                  </details>
-
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <Button onClick={() => saveProvider(p)} disabled={st.saving}>
-                      {st.saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                      저장
-                    </Button>
-                    {p.testable && (
-                      <Button variant="outline" onClick={() => testProvider(p)} disabled={st.testing}>
-                        {st.testing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
-                        테스트
-                      </Button>
-                    )}
-                    <Button variant="ghost" asChild>
-                      <a href={p.issueUrl} target="_blank" rel="noreferrer">
-                        발급 페이지 <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                      </a>
-                    </Button>
-                    <a href={p.docUrl} target="_blank" rel="noreferrer" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
-                      심화 가이드
-                    </a>
-                  </div>
-
-                  {st.msg && (
-                    <p className={`text-sm ${st.ok === false ? 'text-destructive' : st.ok === true ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                      {st.msg}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            )
-          })}
+          {/* Paid providers */}
+          <div className="space-y-2 pt-2">
+            <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+              <Badge>유료</Badge> 유료 모델 & 증권사 — 거래 기능 (유료 티어)
+            </h3>
+            {tier.current === 'free' && (
+              <p className="text-sm text-muted-foreground">키는 미리 저장해 둘 수 있지만, 거래 기능은 유료 티어로 전환해야 활성화됩니다.</p>
+            )}
+            {paidProviders.map(renderProvider)}
+          </div>
 
           {/* Alternatives + advanced links */}
           <Card>

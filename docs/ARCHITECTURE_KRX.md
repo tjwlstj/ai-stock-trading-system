@@ -143,6 +143,29 @@ class BrokerAdapter(Protocol):
 
 ---
 
+## 6.5 티어 정책 (무료 vs 유료) — `config/tiers.yaml`
+
+기능 허용 범위를 코드 곳곳이 아니라 **한 파일(`config/tiers.yaml`)에서 선언**하고, 백엔드 [`backend/app/tiers.py`](../backend/app/tiers.py)가 이를 읽어 게이팅합니다. (하네스 설정처럼 "정책 컨텍스트"를 분리)
+
+| 기능 | 무료 (free) | 유료 (paid) |
+|------|:----------:|:----------:|
+| 분석 (analyze) | ✅ | ✅ |
+| 조언 (advise) | ✅ | ✅ |
+| 주문 실행 (place_orders) | ❌ | ✅ (RiskGuard·수동확인 필수) |
+| 실거래 (live_trading) | ❌ | ✅ (`ALLOW_LIVE_TRADING`+`toss`+한도 충족 시) |
+| 선택 가능 브로커 | `paper`만 | `paper`/`kis`/`toss` |
+| 기본 AI 모델 | Gemini **무료** 키 | OpenAI(유료) + Gemini |
+
+**핵심 원칙 — 무료는 "조언까지만", 구매/주문은 보수적으로 차단**:
+- 무료 티어에서 `ALLOW_LIVE_TRADING=true`나 `BROKER=toss/kis`를 시도하면 **백엔드가 자동으로 `paper`/실거래 OFF로 되돌리고** 그 사실을 사용자에게 알립니다(`/api/settings/secrets` POST의 `adjustments`).
+- 프론트 설정 화면은 무료 티어일 때 실거래 토글을 비활성화하고 브로커 선택을 `paper`로 제한합니다.
+- 키 구분: 무료=`GEMINI_API_KEY`(학습 사용 가능 → 민감정보 금지), 유료=`OPENAI_API_KEY`·브로커 키.
+- 실제 주문 실행 코드(Phase 4~6)는 진입 지점에서 `tiers.can("place_orders")`를 반드시 확인한다.
+
+> 티어는 자체 호스팅 모드 스위치(`APP_TIER`)이며, 결제/라이선스 시스템이 아닙니다. 운영 시 한도(`max_order_amount_krw` 등)는 `config/tiers.yaml`에서 조정합니다.
+
+---
+
 ## 7. 최신 기반기술 채택 (2026 조사)
 
 | 영역 | 기존 | 채택 |
